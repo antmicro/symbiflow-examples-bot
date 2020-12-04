@@ -88,8 +88,10 @@ and so you will need to add some ``sudo`` commands to the instructions below.
 
         bash conda_installer.sh -b -p $INSTALL_DIR/xc7/conda
         source "$INSTALL_DIR/xc7/conda/etc/profile.d/conda.sh"
-        conda env create -f xc7/environment.yml
+        conda create --file xc7/conda.lock -n xc7
         conda activate xc7
+        which python
+        python -m pip install -r xc7/requirements.txt
         mkdir -p $INSTALL_DIR/xc7/install
         wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/presubmit/install/1049/20201123-030526/symbiflow-arch-defs-install-05bd35c7.tar.xz | tar -xJC $INSTALL_DIR/xc7/install
         mkdir -p $INSTALL_DIR/xc7/install/share/symbiflow/arch
