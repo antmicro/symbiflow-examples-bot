@@ -2,6 +2,7 @@ name: xc7
 channels:
   - litex-hub
 dependencies:
+  - dummy-pkg
   - litex-hub::symbiflow-yosys=0.8_6021_gd8b2d1a2=20201120_145821_libffi33
   - litex-hub::symbiflow-yosys-plugins=1.0.0.7_0174_g5e6370a=20201012_171341
   - litex-hub::symbiflow-vtr=8.0.0rc2_5082_gf1a3bcc2a=20201105_110531
