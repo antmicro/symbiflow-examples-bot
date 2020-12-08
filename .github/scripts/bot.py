@@ -5,12 +5,11 @@ from os.path import isdir, join
 from subprocess import run, PIPE, STDOUT, CalledProcessError
 from sys import exit
 
-def _run(cmd_string):
+def _run(cmd_string, **kwargs):
     cmd = cmd_string.split()
     cwd = repo_path if isdir(repo_path) else None
 
-    return run(cmd, check=True, cwd=cwd, encoding='utf-8', stderr=STDOUT,
-            stdout=PIPE).stdout
+    return run(cmd, check=True, cwd=cwd, **kwargs)
 
 repo_path = 'bot_repo_clone'
 
@@ -22,14 +21,16 @@ environment_path = environ['BOT_ENV_YML']
 lock_path = environ['BOT_LOCKFILE']
 
 assert not isdir(repo_path), repo_path
-print(_run('git clone https://' + gh_token + '@github.com/' + gh_repo_name + '.git ' + repo_path))
+_run('git clone https://' + gh_token + '@github.com/' + gh_repo_name + '.git '
+        + repo_path)
 _run('git config user.name BOT')
 _run('git config user.email <>')
-print(_run('git checkout -b ' + branch_name))
+_run('git checkout -b ' + branch_name)
 
-print(_run('conda env remove -n bot_env'))
-print(_run('conda env create -n bot_env -f ' + environment_path))
-new_lock = _run('conda list -n bot_env --explicit')
+_run('conda env remove -n bot_env')
+_run('conda env create -n bot_env -f ' + environment_path)
+new_lock = _run('conda list -n bot_env --explicit', encoding='utf-8',
+        stderr=STDOUT, stdout=PIPE).stdout
 
 # `open` isn't run from inside the `repo_path` like `_run` commands
 with open(join(repo_path, lock_path), 'r+') as f:
@@ -47,8 +48,8 @@ with open(join(repo_path, lock_path), 'r+') as f:
         print('New lock is:')
         print(f.read())
 
-print(_run('git commit -m LOCK_BUMP ' + lock_path))
-print(_run('git push -u origin ' + branch_name))
+_run('git commit -m LOCK_BUMP ' + lock_path)
+_run('git push -u origin ' + branch_name)
 
 _run('git config --unset user.name')
 _run('git config --unset user.email')
