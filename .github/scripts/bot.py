@@ -5,6 +5,8 @@ from os.path import isdir, join
 from subprocess import run, PIPE, STDOUT, CalledProcessError
 from sys import exit
 
+from github import Github
+
 def _run(cmd_string, **kwargs):
     cmd = cmd_string.split()
     cwd = repo_path if isdir(repo_path) else None
@@ -19,6 +21,7 @@ gh_repo_name = environ['GITHUB_REPOSITORY']
 branch_name = environ['BOT_BRANCH'] + '_' + environ['GITHUB_ACTION']
 environment_path = environ['BOT_ENV_YML']
 lock_path = environ['BOT_LOCKFILE']
+pr_base_branch_name = environ['BOT_PR_BASE']
 
 assert not isdir(repo_path), repo_path
 _run('git clone https://' + gh_token + '@github.com/' + gh_repo_name + '.git '
@@ -53,3 +56,8 @@ _run('git push -u origin ' + branch_name)
 
 _run('git config --unset user.name')
 _run('git config --unset user.email')
+
+gh_repo = Github(gh_token).get_repo(gh_repo_name)
+# It's necessary to pass 4 arguments so the body can't be skipped
+gh_repo.create_pull(head=branch_name, base=pr_base_branch_name,
+        title='[BOT] Bump ' + lock_path, body='')
