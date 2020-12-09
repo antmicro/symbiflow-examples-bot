@@ -13,15 +13,23 @@ def _run(cmd_string, **kwargs):
 
     return run(cmd, check=True, cwd=cwd, **kwargs)
 
+def _get_env(env_name):
+    env_var = environ[env_name]
+    print('* ' + env_name + ': ' + env_var)
+    return env_var
+
 repo_path = 'bot_repo_clone'
 
-gh_token = environ['GITHUB_TOKEN']
-gh_repo_name = environ['GITHUB_REPOSITORY']
+print('Environment variables used are:')
+# Correct token will be replaced by asterisks in GH Actions log
+gh_token = _get_env('GITHUB_TOKEN')
+gh_repo_name = _get_env('GITHUB_REPOSITORY')
 
-branch_name = environ['BOT_BRANCH'] + '_' + environ['GITHUB_ACTION']
-environment_path = environ['BOT_ENV_YML']
-lock_path = environ['BOT_LOCKFILE']
-pr_base_branch_name = environ['BOT_PR_BASE']
+branch_name = _get_env('BOT_BRANCH') + '_' + _get_env('GITHUB_ACTION')
+environment_path = _get_env('BOT_ENV_YML')
+lock_path = _get_env('BOT_LOCKFILE')
+pr_base_branch_name = _get_env('BOT_PR_BASE')
+print()
 
 assert not isdir(repo_path), repo_path
 # Only the `gh_token` matters but without any username it doesn't always work
