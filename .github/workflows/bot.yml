@@ -1,0 +1,49 @@
+name: bot
+on: workflow_dispatch
+
+jobs:
+  update-locks:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { branch: 'update_locks', env_yml: 'xc7/environment.yml', lockfile: 'xc7/conda.lock', pr_base: 'master' }
+
+    env:
+      BOT_BRANCH:   ${{ matrix.branch }}
+      BOT_ENV_YML:  ${{ matrix.env_yml }}
+      BOT_LOCKFILE: ${{ matrix.lockfile }}
+      BOT_PR_BASE:  ${{ matrix.pr_base }}
+
+    steps:
+    - name: Check environment
+      run: |
+        set -x
+        echo "$PWD"
+        ls -l
+        echo "BOT_BRANCH: $BOT_BRANCH"
+        echo "BOT_ENV_YML: $BOT_ENV_YML"
+        echo "BOT_LOCKFILE: $BOT_LOCKFILE"
+        echo "BOT_PR_BASE: $BOT_PR_BASE"
+        which conda
+        conda -V
+        python -V
+
+    - name: Gather dependencies
+      run: |
+        echo "$PWD"
+        ls -l
+        python -m pip install pygithub
+        wget https://raw.githubusercontent.com/antmicro/symbiflow-examples-bot/master/.github/scripts/bot.py
+        ls -l
+
+    - name: Update Lock And Create Pull Request
+      run: |
+        echo "$PWD"
+        ls -l
+        echo "BOT_BRANCH: $BOT_BRANCH"
+        echo "BOT_ENV_YML: $BOT_ENV_YML"
+        echo "BOT_LOCKFILE: $BOT_LOCKFILE"
+        echo "BOT_PR_BASE: $BOT_PR_BASE"
+        python bot.py
