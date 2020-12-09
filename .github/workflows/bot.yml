@@ -25,22 +25,33 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-    - name: Check environment
+    - name: Activate Conda Base Environment
       run: |
+        which conda
+        which python3
+        python3 -V
+        python3 -m pip list
+        eval "$('conda' 'shell.bash' 'hook' 2>/dev/null)"
+        which conda
+        which python3
+        python3 -V
+        python3 -m pip list
+
+    - name: Check Environment
+      run: |
+        echo "GITHUB_ACTION: $GITHUB_ACTION"
         echo "BOT_BRANCH: $BOT_BRANCH"
         echo "BOT_ENV_YML: $BOT_ENV_YML"
         echo "BOT_LOCKFILE: $BOT_LOCKFILE"
         echo "BOT_PR_BASE: $BOT_PR_BASE"
         which conda
         which python3
-        conda list
-        conda -V
-        python3 -V
+        conda env list
         python3 -m pip list
 
-    - name: Gather dependencies
+    - name: Gather Dependencies
       run: |
-        python3 -m pip install setuptools
+        #python3 -m pip install setuptools
         python3 -m pip install pygithub
         wget https://raw.githubusercontent.com/antmicro/symbiflow-examples-bot/${{ github.event.inputs.bot_rev_and_path }}
 
