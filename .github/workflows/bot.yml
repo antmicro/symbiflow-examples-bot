@@ -28,14 +28,26 @@ jobs:
     - name: Activate Conda Base Environment
       run: |
         which conda
+        conda env list
         which python3
         python3 -V
         python3 -m pip list
+        conda create -y -n test pip
+        conda activate test || true
         eval "$('conda' 'shell.bash' 'hook' 2>/dev/null)"
         which conda
+        conda env list
+        conda list
         which python3
         python3 -V
         python3 -m pip list
+        conda activate test
+        conda env list
+        conda install -y -c conda-forge pipenv
+        conda list
+        python3 -m pip list
+        which pipenv
+        pipenv -h
 
     - name: Check Environment
       run: |
@@ -48,6 +60,12 @@ jobs:
         which python3
         conda env list
         python3 -m pip list
+        conda activate test || true
+        conda env list
+        eval "$('conda' 'shell.bash' 'hook' 2>/dev/null)"
+        conda activate test
+        conda env list
+        pipenv -h
 
     - name: Gather Dependencies
       run: |
