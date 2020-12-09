@@ -1,5 +1,12 @@
 name: bot
-on: workflow_dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      bot_rev_and_path:
+        description: 'Revision and path of the bot script (GIT_REV/PATH/TO/bot.py)'
+        required: true
+        default: 'master/.github/scripts/bot.py'
 
 jobs:
   update-locks:
@@ -15,35 +22,34 @@ jobs:
       BOT_ENV_YML:  ${{ matrix.env_yml }}
       BOT_LOCKFILE: ${{ matrix.lockfile }}
       BOT_PR_BASE:  ${{ matrix.pr_base }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - name: Check environment
       run: |
-        set -x
-        echo "$PWD"
-        ls -l
         echo "BOT_BRANCH: $BOT_BRANCH"
         echo "BOT_ENV_YML: $BOT_ENV_YML"
         echo "BOT_LOCKFILE: $BOT_LOCKFILE"
         echo "BOT_PR_BASE: $BOT_PR_BASE"
         which conda
+        which python3
+        conda list
         conda -V
-        python -V
+        python3 -V
+        python3 -m pip list
 
     - name: Gather dependencies
       run: |
-        echo "$PWD"
-        ls -l
-        python -m pip install pygithub
-        wget https://raw.githubusercontent.com/antmicro/symbiflow-examples-bot/master/.github/scripts/bot.py
-        ls -l
+        python3 -m pip install setuptools
+        python3 -m pip install pygithub
+        wget https://raw.githubusercontent.com/antmicro/symbiflow-examples-bot/${{ github.event.inputs.bot_rev_and_path }}
 
     - name: Update Lock And Create Pull Request
       run: |
-        echo "$PWD"
         ls -l
         echo "BOT_BRANCH: $BOT_BRANCH"
         echo "BOT_ENV_YML: $BOT_ENV_YML"
         echo "BOT_LOCKFILE: $BOT_LOCKFILE"
         echo "BOT_PR_BASE: $BOT_PR_BASE"
-        python bot.py
+        python3 bot.py
+        ls -l ..
