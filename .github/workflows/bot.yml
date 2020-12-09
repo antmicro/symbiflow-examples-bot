@@ -22,7 +22,7 @@ jobs:
       BOT_ENV_YML:  ${{ matrix.env_yml }}
       BOT_LOCKFILE: ${{ matrix.lockfile }}
       BOT_PR_BASE:  ${{ matrix.pr_base }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ github.token }}
 
     steps:
     - name: Check environment
@@ -31,6 +31,7 @@ jobs:
         echo "BOT_ENV_YML: $BOT_ENV_YML"
         echo "BOT_LOCKFILE: $BOT_LOCKFILE"
         echo "BOT_PR_BASE: $BOT_PR_BASE"
+        git --version
         which conda
         which python3
         conda list

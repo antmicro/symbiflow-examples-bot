@@ -24,8 +24,9 @@ lock_path = environ['BOT_LOCKFILE']
 pr_base_branch_name = environ['BOT_PR_BASE']
 
 assert not isdir(repo_path), repo_path
-_run('git clone https://' + gh_token + '@github.com/' + gh_repo_name + '.git '
-        + repo_path)
+# Only the `gh_token` matters but without any username it doesn't always work
+_run('git clone https://username:' + gh_token + '@github.com/' + gh_repo_name
+        + '.git ' + repo_path)
 _run('git config user.name BOT')
 _run('git config user.email <>')
 _run('git checkout -b ' + branch_name)
