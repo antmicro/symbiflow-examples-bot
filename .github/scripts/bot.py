@@ -25,7 +25,7 @@ print('Environment variables used are:')
 gh_token = _get_env('GITHUB_TOKEN')
 gh_repo_name = _get_env('GITHUB_REPOSITORY')
 
-branch_name = _get_env('BOT_BRANCH') + '_' + _get_env('GITHUB_ACTION')
+branch_name = _get_env('BOT_BRANCH') + '_' + _get_env('GITHUB_RUN_ID')
 environment_path = _get_env('BOT_ENV_YML')
 lock_path = _get_env('BOT_LOCKFILE')
 pr_base_branch_name = _get_env('BOT_PR_BASE')
