@@ -31,6 +31,8 @@ jobs:
         echo "BOT_ENV_YML: $BOT_ENV_YML"
         echo "BOT_LOCKFILE: $BOT_LOCKFILE"
         echo "BOT_PR_BASE: $BOT_PR_BASE"
+        which git
+        git --version
         which conda
         which python3
         conda list
