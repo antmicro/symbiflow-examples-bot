@@ -34,13 +34,12 @@ https://conda.anaconda.org/litex-hub/linux-64/symbiflow-yosys-0.8_6021_gd8b2d1a2
 https://repo.anaconda.com/pkgs/main/linux-64/libcurl-7.71.1-h20c2e04_1.conda
 https://repo.anaconda.com/pkgs/main/linux-64/python-3.8.5-h7579374_1.conda
 https://conda.anaconda.org/litex-hub/linux-64/symbiflow-yosys-plugins-1.0.0.7_0174_g5e6370a-20201012_171341.tar.bz2
-https://repo.anaconda.com/pkgs/main/linux-64/certifi-2020.11.8-py38h06a4308_0.conda
+https://repo.anaconda.com/pkgs/main/linux-64/certifi-2020.12.5-py38h06a4308_0.conda
 https://repo.anaconda.com/pkgs/main/linux-64/git-2.23.0-pl526hacde149_0.conda
 https://repo.anaconda.com/pkgs/main/linux-64/lxml-4.6.2-py38h9120a33_0.conda
 https://repo.anaconda.com/pkgs/main/linux-64/simplejson-3.17.2-py38h7b6447c_0.conda
 https://repo.anaconda.com/pkgs/main/noarch/sortedcontainers-2.3.0-pyhd3eb1b0_0.conda
-https://repo.anaconda.com/pkgs/main/noarch/wheel-0.36.0-pyhd3eb1b0_0.conda
+https://repo.anaconda.com/pkgs/main/noarch/wheel-0.36.1-pyhd3eb1b0_0.conda
 https://repo.anaconda.com/pkgs/main/noarch/intervaltree-3.1.0-py_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/setuptools-50.3.2-py38h06a4308_2.conda
-https://repo.anaconda.com/pkgs/main/linux-64/pip-20.3-py38h06a4308_0.conda
-
+https://repo.anaconda.com/pkgs/main/linux-64/setuptools-51.0.0-py38h06a4308_2.conda
+https://repo.anaconda.com/pkgs/main/linux-64/pip-20.3.1-py38h06a4308_0.conda
