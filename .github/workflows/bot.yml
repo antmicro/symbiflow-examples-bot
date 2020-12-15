@@ -51,7 +51,6 @@ jobs:
       run: |
         python3 -m pip install setuptools
         python3 -m pip install pygithub
-        python3 -m pip install ruamel.yaml
         wget https://raw.githubusercontent.com/antmicro/symbiflow-examples-bot/${{ github.event.inputs.bot_rev_and_path }}
 
     - name: Update Lock And Create Pull Request

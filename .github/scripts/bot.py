@@ -6,15 +6,6 @@ from subprocess import run, PIPE, CalledProcessError
 from sys import exit
 from re import match, search, VERBOSE
 
-# Conda's `pip` doesn't install `ruamel.yaml` because it finds it is already
-# installed but the one from Conda has to be imported with `ruamel_yaml`
-try:
-    from ruamel.yaml import YAML
-except ModuleNotFoundError:
-    from ruamel_yaml import YAML
-yaml = YAML()
-yaml.allow_duplicate_keys = True
-
 from github import Github
 
 def _run(cmd_string, return_stdout=False, **kwargs):
@@ -56,67 +47,6 @@ chdir(repo_path)
 _run('git config user.name BOT')
 _run('git config user.email <>')
 _run('git checkout -b ' + branch_name)
-
-# Manage pip requirements
-def get_github_specification(specification):
-    match = search(r'''
-        (github.com/[^@\#\s]*)    # address without protocol
-        @?([^\#\s]*)?             # optional @REVISION without @
-        \#?([^\s]*)?                # optional #EGG without #
-        ''', specification, VERBOSE)
-    if match == None:
-        return None
-    else:
-        gh_spec = {
-            'address':  match.group(1),
-            'name':     match.group(1).split('/')[-1].rstrip('.git'),
-            'revision': match.group(2) or 'HEAD',
-            'egg':      match.group(3),
-            }
-        return gh_spec
-
-# Return untouched if None, extend if appending a list and append otherwise
-def append_flat_if_not_none(appended_list, unknown_type_element):
-    if unknown_type_element is not None:
-        if isinstance(unknown_type_element, list):
-            appended_list.extend(unknown_type_element)
-        else:
-            appended_list.append(unknown_type_element)
-    return appended_list
-
-def analyze_pip_requirement(requirement):
-    path_match = match(r'-r (file:)?(.*)', requirement)
-    if path_match is None:
-        return get_github_specification(requirement)
-    else:  # `requirement` includes some additional `requirements.txt` file
-        # `-r PATH` is relative to the environment file
-        req_path = join(dirname(environment_path), path_match.group(2))
-        print('Found additional pip requirements file: ' + req_path)
-        with open(req_path, 'r') as f:
-            file_git_repos_found = []
-            for req_line in f.readlines():
-                git_repos_found = analyze_pip_requirement(req_line)
-                file_git_repos_found = append_flat_if_not_none(
-                    file_git_repos_found, git_repos_found )
-            return file_git_repos_found
-
-with open(environment_path, 'r') as f:
-    env_yml = yaml.load(f.read())
-
-all_git_specs = []
-for dependency in env_yml['dependencies']:
-    if isinstance(dependency, dict) and 'pip' in dependency.keys():
-        for pip_requirement in dependency['pip']:
-            dependency_git_specs = analyze_pip_requirement(pip_requirement)
-            # There might be more than one git spec returned if it's `-r PATH`
-            all_git_specs = append_flat_if_not_none(all_git_specs,
-                    dependency_git_specs)
-print()
-print('Git specs found:')
-for specs in all_git_specs:
-    print(specs)
-print()
-#exit(0)
 
 _run('conda env remove -n ' + conda_env)
 _run('conda env create -n ' + conda_env + ' -f ' + environment_path)
