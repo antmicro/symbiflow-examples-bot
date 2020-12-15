@@ -1,6 +1,6 @@
 Arpeggio==1.10.1
 certifi==2020.12.5
-fasm @ git+https://github.com/symbiflow/fasm@098c2764232edfa56bba0575d1ad79db9cfe743c
+fasm @ git+https://github.com/symbiflow/fasm@3b6ce8a743ea54948e3a3401fdfabfbf927424bc
 prjxray @ git+git://github.com/SymbiFlow/prjxray.git@483a89c292b5367e9f18cff21b4bcd182d81c401
 python-constraint==1.4.0
 textX==2.3.0
