@@ -2,6 +2,23 @@ name: bot
 
 on:
   workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 'Message of the bump commit'
+        required: true
+        default: '[BOT] Bump locks'
+      user_name:
+        description: 'Name of the user creating commit'
+        required: true
+        default: 'LOCK_UPDATING_BOT'
+      user_email:
+        description: 'Email address of the user creating commit'
+        required: true
+        default: '<>'
+      pr_title:
+        description: 'Title of the Pull Request'
+        required: true
+        default: '[BOT] Bump locks'
 
 jobs:
   update-locks:
@@ -10,19 +27,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { branch: 'update_locks', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda.lock', pip_lock: 'xc7/pip.lock', pr_base: 'master' }
-
+          - { branch_name: 'update_xc7', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda.lock', pip_lock: 'xc7/pip.lock' }
+          - { branch_name: 'update_eos-s3', env_yml: 'eos-s3/environment.yml', conda_lock: 'eos-s3/conda.lock', pip_lock: 'eos-s3/pip.lock' }
     env:
-      BOT_BRANCH:     ${{ matrix.branch }}
-      BOT_ENV_YML:    ${{ matrix.env_yml }}
-      BOT_CONDA_LOCK: ${{ matrix.conda_lock }}
-      BOT_PIP_LOCK:   ${{ matrix.pip_lock }}
-      BOT_PR_BASE:    ${{ matrix.pr_base }}
-      GITHUB_TOKEN:   ${{ github.token }}
-
+      BOT_BRANCH:     ${{ matrix.branch_name }}_${{ github.run_id }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        submodules:  'recursive'
 
     - name: Check environment
       run: |
@@ -45,10 +59,43 @@ jobs:
         python3 -m pip list
         echo "::endgroup::"
 
-    - name: Gather dependencies
+    - name: Create new branch
       run: |
-        python3 -m pip install pygithub
+        git checkout -b "$BOT_BRANCH"
 
-    - name: Update Lock And Create Pull Request
+    - name: Update Conda Lock
       run: |
         python3 .github/scripts/bot.py
+        echo $?
+      env:
+        BOT_ENV_NAME:   'bot_env'
+        BOT_ENV_YML:    ${{ matrix.env_yml }}
+        BOT_CONDA_LOCK: ${{ matrix.conda_lock }}
+        BOT_PIP_LOCK:   ${{ matrix.pip_lock }}
+
+    - name: Commit And Push Changes
+      run: |
+        git config user.name "$USER_NAME"
+        git config user.email "$USER_EMAIL"
+        git add "$BOT_CONDA_LOCK" "$BOT_PIP_LOCK"
+        git commit -m "$COMMIT_MESSAGE"
+        git push -u origin "$BOT_BRANCH"
+      env:
+        BOT_CONDA_LOCK: ${{ matrix.conda_lock }}
+        BOT_PIP_LOCK:   ${{ matrix.pip_lock }}
+        COMMIT_MESSAGE: ${{ github.event.inputs.commit_message }}
+        USER_NAME:      ${{ github.event.inputs.user_name }}
+        USER_EMAIL:     ${{ github.event.inputs.user_email }}
+
+    - name: Create A Pull Request
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            head: `${process.env.BOT_BRANCH}`,
+            base: "master",
+            title: `${{ github.event.inputs.pr_title }},
+          })
