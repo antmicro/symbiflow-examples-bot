@@ -23,7 +23,6 @@ def _get_env(env_name):
     return env_var
 
 conda_env = 'bot_env'
-repo_path = 'bot_repo_clone'
 
 print('Environment variables used are:')
 # The actual token will be replaced by asterisks in GH Actions log
@@ -37,12 +36,6 @@ pip_lock_path = _get_env('BOT_PIP_LOCK')
 pr_base_branch_name = _get_env('BOT_PR_BASE')
 print()
 
-assert not isdir(repo_path), repo_path
-# Only the `gh_token` matters but without any username it doesn't always work
-_run('git clone https://username:' + gh_token + '@github.com/' + gh_repo_name
-        + '.git ' + repo_path)
-# Work in the cloned repository from now on
-chdir(repo_path)
 
 _run('git config user.name BOT')
 _run('git config user.email <>')

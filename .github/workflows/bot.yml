@@ -2,11 +2,6 @@ name: bot
 
 on:
   workflow_dispatch:
-    inputs:
-      bot_rev_and_path:
-        description: 'Revision and path of the bot script (GIT_REV/PATH/TO/bot.py)'
-        required: true
-        default: 'master/.github/scripts/bot.py'
 
 jobs:
   update-locks:
@@ -26,6 +21,9 @@ jobs:
       GITHUB_TOKEN:   ${{ github.token }}
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
     - name: Check environment
       run: |
         echo "::group::Check git"
@@ -49,12 +47,8 @@ jobs:
 
     - name: Gather dependencies
       run: |
-        python3 -m pip install setuptools
         python3 -m pip install pygithub
-        wget https://raw.githubusercontent.com/antmicro/symbiflow-examples-bot/${{ github.event.inputs.bot_rev_and_path }}
 
     - name: Update Lock And Create Pull Request
       run: |
-        echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
-        echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
-        python3 bot.py
+        python3 .github/scripts/bot.py
