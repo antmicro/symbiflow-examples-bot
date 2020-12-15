@@ -2,7 +2,7 @@
 
 from os import environ, chdir
 from os.path import isdir, join, exists, dirname
-from subprocess import run, PIPE, CalledProcessError
+from subprocess import run, PIPE
 from sys import exit
 from re import match, search, VERBOSE
 
