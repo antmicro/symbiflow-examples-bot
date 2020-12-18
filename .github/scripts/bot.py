@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-from os import environ, chdir
-from os.path import isdir, join, exists, dirname
+from os import environ
 from subprocess import run, DEVNULL, PIPE
 from sys import exit
-from re import match, search, VERBOSE
+from re import match, search
 
 def _run(cmd_string, multiword_last_arg='', return_stdout=False, **kwargs):
     cmd = cmd_string.split() + ([multiword_last_arg]
@@ -29,7 +28,7 @@ def _remove_conda_env(conda_env_name):
     _run('conda env remove -n ' + conda_env_name, stdout=DEVNULL,
             stderr=DEVNULL)
     print('done!')
-
+    print()
 
 # Returns True if lock file has been updated, False otherwise
 def try_updating_lock_file(path, new_lock):
@@ -47,7 +46,6 @@ def try_updating_lock_file(path, new_lock):
         f.write(new_lock)
     print()
     return True
-
 
 def main():
     print('Environment variables used are:')
@@ -72,6 +70,8 @@ def main():
 
     # Capture explicit list of Conda packages
     conda_lock = _run('conda list --explicit -n ' + conda_env, return_stdout=True)
+    print('Conda packages captured.')
+    print()
 
     # Capture frozen list of pip packages
 
@@ -80,7 +80,7 @@ def main():
 
     # Check pip version
     pip_version_match = search(r'pip\-([0-9]+)\.([0-9]+)[^\-]+-[^\-]+\.',
-            conda_lock, VERBOSE)
+            conda_lock)
     if pip_version_match is not None:
         if pip_lock_path is None:
             print('ERROR: The environment uses pip dependencies but '
@@ -93,9 +93,9 @@ def main():
         if int(major) < 20 or ( int(major) == 20 and int(minor) == 0 ):
             print('WARNING: The current version of pip (older than 20.1) is unable'
                     + ' to properly handle git-based packages!')
+            print()
 
         pip_lock = ''
-        print()
         for pip_spec in _run('conda run -n ' + conda_env + ' python -m pip freeze',
                 return_stdout=True).split('\n'):
             # Remove packages installed by Conda (lines: 'NAME @ file://PATH/work')
@@ -105,11 +105,13 @@ def main():
             else:
                 print('Conda package removed from pip.lock: ' + conda_pkg_match.group(1))
         print()
+        print('Pip packages captured.')
+        print()
 
     # Conda environment isn't needed anymore
     _remove_conda_env(conda_env)
-
     updated_files = []
+
     if try_updating_lock_file(conda_lock_path, conda_lock):
         updated_files.append(conda_lock_path)
     if pip_lock and try_updating_lock_file(pip_lock_path, pip_lock):
@@ -123,7 +125,6 @@ def main():
         for file in updated_files:
             print('* ' + file)
         exit(0)
-
 
 if __name__ == '__main__':
     main()
