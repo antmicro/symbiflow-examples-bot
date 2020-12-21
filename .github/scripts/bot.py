@@ -5,6 +5,10 @@ from subprocess import run, DEVNULL, PIPE
 from sys import exit
 from re import match, search
 
+from ruamel.yaml import YAML
+yaml = YAML()
+yaml.allow_duplicate_keys = True
+
 def _run(cmd_string, multiword_last_arg='', return_stdout=False, **kwargs):
     cmd = cmd_string.split() + ([multiword_last_arg]
             if multiword_last_arg else [])
@@ -47,29 +51,73 @@ def try_updating_lock_file(path, new_lock):
     print()
     return True
 
+def separate_and_save_deps(env_yml_path):
+    with open(env_yml_path, 'r') as f:
+        env_yml = yaml.load(f.read())
+    for dependency in env_yml['dependencies']:
+        # `- pip:` line becomes a dict-like object with `pip` key after parsing
+        if isinstance(dependency, dict) and 'pip' in dependency.keys():
+            # `pip:` key is replaced with `pip` package to have it installed
+            # even when there was only `pip:` key in `environment.yml`
+            env_yml['dependencies'].remove(dependency)
+            env_yml['dependencies'].append('pip')
+
+            # Save `environment.yml` without pip requirements
+            pipless_env_yml_path = 'bot-env.yml'
+            with open(pipless_env_yml_path, 'w') as f:
+                yaml.dump(env_yml, f)
+
+            # Save extracted requirements
+            pip_req_path = 'bot-req.txt'
+            with open(pip_req_path, 'w') as f:
+                f.writelines(list(dependency['pip']))
+
+            return (pipless_env_yml_path, pip_req_path)
+    return (env_yml_path, None)
+
 def main():
     print('Environment variables used are:')
     conda_env = _get_env('BOT_ENV_NAME')
-    environment_path = _get_env('BOT_ENV_YML')
+    env_yml_path = _get_env('BOT_ENV_YML')
     conda_lock_path = _get_env('BOT_CONDA_LOCK')
     pip_lock_path = _get_env('BOT_PIP_LOCK', required=False)
     print()
-    if None in [conda_env, environment_path, conda_lock_path]:
+    if None in [conda_env, env_yml_path, conda_lock_path]:
         exit(1)
 
+    (pipless_env_yml_path, pip_req_path) = separate_and_save_deps(env_yml_path)
+    if pip_req_path and pip_lock_path is None:
+            print('ERROR: Conda environment from `' + env_yml_path +
+                    '` depends on pip packages!')
+            print('Please set BOT_PIP_LOCK environment variable and rerun.')
+            print()
+            exit(1)
+
     print('Creating `' + conda_env + '` environment based on `'
-            + environment_path + '`...')
+            + pipless_env_yml_path + '`...')
     print()
     try:
-        _run('conda env create -n ' + conda_env + ' -f ' + environment_path)
+        _run('conda env create -n ' + conda_env + ' -f ' + pipless_env_yml_path)
     except:
         print('ERROR: Creating `' + conda_env + '` environment failed!')
         print('Please remove any environment with such name, if exists.')
         print()
         exit(1)
 
+    if pip_req_path:
+        # `--live-stream` avoids buffering output by `conda run`
+        pip_cmd = 'conda run --live-stream -n ' + conda_env + ' python -I -m pip '
+
+        _run(pip_cmd + 'install -r ' + pip_req_path)
+        pip_lock = _run(pip_cmd + 'freeze', return_stdout=True)
+        print()
+        print('Locked:')
+        print()
+        print(pip_lock)
+    exit()
+
     # Capture explicit list of Conda packages
-    conda_lock = _run('conda list --explicit -n ' + conda_env, return_stdout=True)
+    conda_lock = _run('conda list -n ' + conda_env, return_stdout=True)
     print('Conda packages captured.')
     print()
 
