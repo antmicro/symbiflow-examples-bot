@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from os import environ
+from os.path import dirname, exists, join
 from subprocess import run, DEVNULL, PIPE
 from sys import exit
 from re import match, search
@@ -51,9 +52,35 @@ def try_updating_lock_file(path, new_lock):
     print()
     return True
 
-def separate_and_save_deps(env_yml_path):
+def analyze_pip_requirement(requirement, analyzed_file_dir):
+    path_match = match(r'-r (file:)?(.*)', requirement)
+    if path_match is None:
+        return [ requirement ]
+    else:  # `requirement` includes some additional `requirements.txt` file
+        # `-r PATH` is relative to the environment file
+        req_path = join(analyzed_file_dir, path_match.group(2))
+        print('Found additional pip requirements file: ' + req_path)
+        with open(req_path, 'r') as f:
+            file_requirements = []
+            for req_line in f.readlines():
+                file_requirements.extend(
+                        analyze_pip_requirement(req_line, dirname(req_path))
+                )
+            return file_requirements
+
+def get_all_pip_dependencies(pip_dependencies, analyzed_file_dir):
+    all_pip_dependencies = []
+    for pip_dependency in pip_dependencies:
+        all_pip_dependencies.extend(
+                analyze_pip_requirement(pip_dependency, analyzed_file_dir)
+        )
+    return all_pip_dependencies
+
+def extract_pip_dependencies(env_yml_path):
     with open(env_yml_path, 'r') as f:
         env_yml = yaml.load(f.read())
+
+    pip_dependencies = None
     for dependency in env_yml['dependencies']:
         # `- pip:` line becomes a dict-like object with `pip` key after parsing
         if isinstance(dependency, dict) and 'pip' in dependency.keys():
@@ -61,19 +88,27 @@ def separate_and_save_deps(env_yml_path):
             # even when there was only `pip:` key in `environment.yml`
             env_yml['dependencies'].remove(dependency)
             env_yml['dependencies'].append('pip')
+            env_yml_pip_dependencies = list(dependency['pip'])
 
             # Save `environment.yml` without pip requirements
-            pipless_env_yml_path = 'bot-env.yml'
-            with open(pipless_env_yml_path, 'w') as f:
+            env_yml_path = 'bot-env.yml'
+            with open(env_yml_path, 'w') as f:
                 yaml.dump(env_yml, f)
+    return (env_yml_path, env_yml_pip_dependencies)
 
-            # Save extracted requirements
-            pip_req_path = 'bot-req.txt'
-            with open(pip_req_path, 'w') as f:
-                f.writelines(list(dependency['pip']))
 
-            return (pipless_env_yml_path, pip_req_path)
-    return (env_yml_path, None)
+def get_local_pip_dependencies(pip_dependencies):
+    local_pip_dependencies = []
+    for dependency in pip_dependencies:
+        path_match = match(r'(\S+)$', dependency)
+        if path_match is None:
+            continue
+        dependency_path = path_match.group(1)
+        print('Analyzing ' + dependency_path)
+        if exists(join(dependency_path, 'setup.py')):
+            print('Found local pip dependency: ' + dependency_path)
+            local_pip_dependencies.append(dependency_path)
+    return local_pip_dependencies
 
 def main():
     print('Environment variables used are:')
@@ -85,13 +120,11 @@ def main():
     if None in [conda_env, env_yml_path, conda_lock_path]:
         exit(1)
 
-    (pipless_env_yml_path, pip_req_path) = separate_and_save_deps(env_yml_path)
-    if pip_req_path and pip_lock_path is None:
-            print('ERROR: Conda environment from `' + env_yml_path +
-                    '` depends on pip packages!')
-            print('Please set BOT_PIP_LOCK environment variable and rerun.')
-            print()
-            exit(1)
+    (pipless_env_yml_path, env_yml_pip_deps) = extract_pip_dependencies(
+            env_yml_path)
+    all_pip_deps = get_all_pip_dependencies(env_yml_pip_deps,
+            dirname(env_yml_path)) if env_yml_pip_deps else None
+    local_deps = get_local_pip_dependencies(all_pip_deps)
 
     print('Creating `' + conda_env + '` environment based on `'
             + pipless_env_yml_path + '`...')
