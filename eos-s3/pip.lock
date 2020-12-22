@@ -1,0 +1,8 @@
+Arpeggio==1.10.1
+certifi==2020.12.5
+fasm @ git+https://github.com/symbiflow/fasm@bae2e6dd782026d9db3e4e00ef535d1b5858322d
+fasm-utils @ git+https://github.com/QuickLogic-Corp/quicklogic-fasm-utils@83c867e3269e1186b9bcd71767bb810c82b3905d
+intervaltree==3.0.2
+python-constraint==1.4.0
+quicklogic-fasm @ git+https://github.com/QuickLogic-Corp/quicklogic-fasm@2312ff03d5690449a597e565430764a162d452b7
+textX==2.3.0
