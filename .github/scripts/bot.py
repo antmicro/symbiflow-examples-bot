@@ -4,7 +4,7 @@ from os import environ
 from os.path import dirname, exists, join
 from subprocess import run, DEVNULL, PIPE
 from sys import exit
-from re import match, search
+from re import match, search, sub
 
 from ruamel.yaml import YAML
 yaml = YAML()
@@ -100,15 +100,20 @@ def extract_pip_dependencies(env_yml_path):
 def get_local_pip_dependencies(pip_dependencies):
     local_pip_dependencies = []
     for dependency in pip_dependencies:
-        path_match = match(r'(\S+)$', dependency)
-        if path_match is None:
+        # Handle comments
+        if dependency.lstrip().startswith('#'):
             continue
-        dependency_path = path_match.group(1)
-        print('Analyzing ' + dependency_path)
+        clean_dep = sub(r'(.*)\s+#.*$', r'\1', dependency)
+
+        # Find core of the dependency line without specifiers
+        core_match = search(r'(^|\s)([^\s-][^\s=<>~!]+)', clean_dep)
+        if core_match is None:
+            continue
+        dependency_path = core_match.group(2)
         if exists(join(dependency_path, 'setup.py')):
-            print('Found local pip dependency: ' + dependency_path)
-            local_pip_dependencies.append(dependency_path)
+            local_pip_dependencies.append(dependency.strip())
     return local_pip_dependencies
+
 
 def main():
     print('Environment variables used are:')
@@ -124,7 +129,13 @@ def main():
             env_yml_path)
     all_pip_deps = get_all_pip_dependencies(env_yml_pip_deps,
             dirname(env_yml_path)) if env_yml_pip_deps else None
+
+    # Local deps need to be passed to the lock because freezing breaks them
     local_deps = get_local_pip_dependencies(all_pip_deps)
+
+    import code
+    code.interact(local=dict(globals(), **locals()))
+    exit()
 
     print('Creating `' + conda_env + '` environment based on `'
             + pipless_env_yml_path + '`...')
