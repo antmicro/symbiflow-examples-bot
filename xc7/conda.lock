@@ -1,45 +1,47 @@
-# This file may be used to create an environment using:
-# $ conda create --name <env> --file <this file>
-# platform: linux-64
-@EXPLICIT
-https://conda.anaconda.org/litex-hub/linux-64/dummy-pkg-0.0-b1.tar.bz2
-https://conda.anaconda.org/litex-hub/linux-64/prjxray-db-0.0_0239_gd87c844-20201120_145821.tar.bz2
-https://repo.anaconda.com/pkgs/main/linux-64/_libgcc_mutex-0.1-main.conda
-https://repo.anaconda.com/pkgs/main/linux-64/ca-certificates-2020.12.8-h06a4308_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/ld_impl_linux-64-2.33.1-h53a641e_7.conda
-https://repo.anaconda.com/pkgs/main/linux-64/libstdcxx-ng-9.1.0-hdf63c60_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/libgcc-ng-9.1.0-hdf63c60_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/expat-2.2.10-he6710b0_2.conda
-https://repo.anaconda.com/pkgs/main/linux-64/icu-58.2-he6710b0_3.conda
-https://repo.anaconda.com/pkgs/main/linux-64/libffi-3.3-he6710b0_2.conda
-https://repo.anaconda.com/pkgs/main/linux-64/make-4.2.1-h1bed415_1.conda
-https://repo.anaconda.com/pkgs/main/linux-64/ncurses-6.2-he6710b0_1.conda
-https://repo.anaconda.com/pkgs/main/linux-64/openssl-1.1.1i-h27cfd23_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/pcre-8.44-he6710b0_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/perl-5.26.2-h14c3975_0.conda
-https://conda.anaconda.org/litex-hub/linux-64/prjxray-tools-0.1_2697_g0f939808-20201120_145821.tar.bz2
-https://repo.anaconda.com/pkgs/main/linux-64/tbb-2020.3-hfd86e86_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/xz-5.2.5-h7b6447c_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/zlib-1.2.11-h7b6447c_3.conda
-https://repo.anaconda.com/pkgs/main/linux-64/libedit-3.1.20191231-h14c3975_1.conda
-https://repo.anaconda.com/pkgs/main/linux-64/libssh2-1.9.0-h1ba5d50_1.conda
-https://repo.anaconda.com/pkgs/main/linux-64/libxml2-2.9.10-hb55368b_3.conda
-https://repo.anaconda.com/pkgs/main/linux-64/readline-8.0-h7b6447c_0.conda
-https://conda.anaconda.org/litex-hub/linux-64/symbiflow-vtr-8.0.0rc2_5082_gf1a3bcc2a-20201105_110531.tar.bz2
-https://repo.anaconda.com/pkgs/main/linux-64/tk-8.6.10-hbc83047_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/krb5-1.18.2-h173b8e3_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/libxslt-1.1.34-hc22bd24_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/sqlite-3.33.0-h62c20be_0.conda
-https://conda.anaconda.org/litex-hub/linux-64/symbiflow-yosys-0.8_6021_gd8b2d1a2-20201120_145821_libffi33.tar.bz2
-https://repo.anaconda.com/pkgs/main/linux-64/libcurl-7.71.1-h20c2e04_1.conda
-https://repo.anaconda.com/pkgs/main/linux-64/python-3.8.5-h7579374_1.conda
-https://conda.anaconda.org/litex-hub/linux-64/symbiflow-yosys-plugins-1.0.0.7_0174_g5e6370a-20201012_171341.tar.bz2
-https://repo.anaconda.com/pkgs/main/linux-64/certifi-2020.12.5-py38h06a4308_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/git-2.23.0-pl526hacde149_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/lxml-4.6.2-py38h9120a33_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/simplejson-3.17.2-py38h7b6447c_0.conda
-https://repo.anaconda.com/pkgs/main/noarch/sortedcontainers-2.3.0-pyhd3eb1b0_0.conda
-https://repo.anaconda.com/pkgs/main/noarch/wheel-0.36.1-pyhd3eb1b0_0.conda
-https://repo.anaconda.com/pkgs/main/noarch/intervaltree-3.1.0-py_0.conda
-https://repo.anaconda.com/pkgs/main/linux-64/setuptools-51.0.0-py38h06a4308_2.conda
-https://repo.anaconda.com/pkgs/main/linux-64/pip-20.3.1-py38h06a4308_0.conda
+name: bot_env
+channels:
+  - litex-hub
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - ca-certificates=2020.12.8=h06a4308_0
+  - certifi=2020.12.5=py38h06a4308_0
+  - dummy-pkg=0.0=b1
+  - expat=2.2.10=he6710b0_2
+  - git=2.23.0=pl526hacde149_0
+  - icu=58.2=he6710b0_3
+  - intervaltree=3.1.0=py_0
+  - krb5=1.18.2=h173b8e3_0
+  - ld_impl_linux-64=2.33.1=h53a641e_7
+  - libcurl=7.71.1=h20c2e04_1
+  - libedit=3.1.20191231=h14c3975_1
+  - libffi=3.3=he6710b0_2
+  - libgcc-ng=9.1.0=hdf63c60_0
+  - libssh2=1.9.0=h1ba5d50_1
+  - libstdcxx-ng=9.1.0=hdf63c60_0
+  - libxml2=2.9.10=hb55368b_3
+  - libxslt=1.1.34=hc22bd24_0
+  - lxml=4.6.2=py38h9120a33_0
+  - make=4.2.1=h1bed415_1
+  - ncurses=6.2=he6710b0_1
+  - openssl=1.1.1i=h27cfd23_0
+  - pcre=8.44=he6710b0_0
+  - perl=5.26.2=h14c3975_0
+  - pip=20.3.3=py38h06a4308_0
+  - prjxray-db=0.0_0239_gd87c844=20201120_145821
+  - prjxray-tools=0.1_2697_g0f939808=20201120_145821
+  - python=3.8.5=h7579374_1
+  - readline=8.0=h7b6447c_0
+  - setuptools=51.0.0=py38h06a4308_2
+  - simplejson=3.17.2=py38h7b6447c_0
+  - sortedcontainers=2.3.0=pyhd3eb1b0_0
+  - sqlite=3.33.0=h62c20be_0
+  - symbiflow-vtr=8.0.0rc2_5082_gf1a3bcc2a=20201105_110531
+  - symbiflow-yosys=0.8_6021_gd8b2d1a2=20201120_145821_libffi33
+  - symbiflow-yosys-plugins=1.0.0.7_0174_g5e6370a=20201012_171341
+  - tbb=2020.3=hfd86e86_0
+  - tk=8.6.10=hbc83047_0
+  - wheel=0.36.2=pyhd3eb1b0_0
+  - xz=5.2.5=h7b6447c_0
+  - zlib=1.2.11=h7b6447c_3
+prefix: /usr/share/miniconda/envs/bot_env
