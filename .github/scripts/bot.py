@@ -2,7 +2,7 @@
 
 from os import environ
 from os.path import dirname, exists, join
-from subprocess import run, DEVNULL, PIPE
+from subprocess import run, DEVNULL, PIPE, CalledProcessError
 from sys import exit
 from re import match, search, sub
 
@@ -14,8 +14,12 @@ def _run(cmd_string, multiword_last_arg='', return_stdout=False, **kwargs):
     cmd = cmd_string.split() + ([multiword_last_arg]
             if multiword_last_arg else [])
     if return_stdout:
-        return run(cmd, check=True, encoding='utf-8', stdout=PIPE,
-                **kwargs).stdout
+        try:
+            return run(cmd, check=True, encoding='utf-8', stdout=PIPE,
+                    **kwargs).stdout
+        except CalledProcessError as e:
+            print(e.output)
+            raise
     else:
         return run(cmd, check=True, **kwargs)
 
