@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 from os import environ
-from os.path import dirname, exists, join
+from os.path import dirname, exists, isdir, join
 from subprocess import run, DEVNULL, PIPE, CalledProcessError
 from sys import exit
 from re import match, search, sub
+from tempfile import NamedTemporaryFile
 
 from ruamel.yaml import YAML
 yaml = YAML()
@@ -103,20 +104,24 @@ def extract_pip_dependencies(env_yml_path):
 
 def get_local_pip_dependencies(pip_dependencies):
     local_pip_dependencies = []
+    local_pip_deps_names = []
     for dependency in pip_dependencies:
+        dependency = dependency.strip()
         # Handle comments
-        if dependency.lstrip().startswith('#'):
+        if dependency.startswith('#'):
             continue
-        clean_dep = sub(r'(.*)\s+#.*$', r'\1', dependency)
+        only_dependency = sub(r'(.*)\s+#.*$', r'\1', dependency)
 
-        # Find core of the dependency line without specifiers
-        core_match = search(r'(^|\s)([^\s-][^\s=<>~!]+)', clean_dep)
-        if core_match is None:
-            continue
-        dependency_path = core_match.group(2)
-        if exists(join(dependency_path, 'setup.py')):
-            local_pip_dependencies.append(dependency.strip())
-    return local_pip_dependencies
+        # Find core of the dependency line without version etc.
+        core_match = search(r'(^|\s)([^\s-][^\s=<>~!;]+)', only_dependency)
+        if core_match is not None and isdir(core_match.group(2)):
+            setup_path = join(core_match.group(2), 'setup.py')
+            if exists(setup_path):
+                dependency_name = _run('python setup.py --name',
+                        cwd=core_match.group(2), return_stdout=True).strip()
+                local_pip_deps_names.append(dependency_name)
+                local_pip_dependencies.append(dependency)
+    return (local_pip_dependencies, local_pip_deps_names)
 
 
 def main():
@@ -131,15 +136,6 @@ def main():
 
     (pipless_env_yml_path, env_yml_pip_deps) = extract_pip_dependencies(
             env_yml_path)
-    all_pip_deps = get_all_pip_dependencies(env_yml_pip_deps,
-            dirname(env_yml_path)) if env_yml_pip_deps else None
-
-    # Local deps need to be passed to the lock because freezing breaks them
-    local_deps = get_local_pip_dependencies(all_pip_deps)
-
-    import code
-    code.interact(local=dict(globals(), **locals()))
-    exit()
 
     print('Creating `' + conda_env + '` environment based on `'
             + pipless_env_yml_path + '`...')
@@ -152,32 +148,12 @@ def main():
         print()
         exit(1)
 
-    if pip_req_path:
-        # `--live-stream` avoids buffering output by `conda run`
-        pip_cmd = 'conda run --live-stream -n ' + conda_env + ' python -I -m pip '
-
-        _run(pip_cmd + 'install -r ' + pip_req_path)
-        pip_lock = _run(pip_cmd + 'freeze', return_stdout=True)
-        print()
-        print('Locked:')
-        print()
-        print(pip_lock)
-    exit()
-
-    # Capture explicit list of Conda packages
-    conda_lock = _run('conda list -n ' + conda_env, return_stdout=True)
+    _run('conda run -n ' + conda_env + ' conda env export -f ' + conda_lock_path)
     print('Conda packages captured.')
     print()
 
-    # Capture frozen list of pip packages
-
-    # Variable will stay None in case there's no pip in environment.yml
-    pip_lock = None
-
-    # Check pip version
-    pip_version_match = search(r'pip\-([0-9]+)\.([0-9]+)[^\-]+-[^\-]+\.',
-            conda_lock)
-    if pip_version_match is not None:
+    # Lock pip dependencies
+    if env_yml_pip_deps:
         if pip_lock_path is None:
             print('ERROR: The environment uses pip dependencies but '
                     + 'BOT_PIP_LOCK environment variable hasn\'t been set!')
@@ -185,42 +161,55 @@ def main():
             _remove_conda_env(conda_env)
             exit(1)
 
-        major, minor = pip_version_match.groups()
-        if int(major) < 20 or ( int(major) == 20 and int(minor) == 0 ):
-            print('WARNING: The current version of pip (older than 20.1) is unable'
-                    + ' to properly handle git-based packages!')
+        pip_cmd = 'conda run --no-capture-output -n ' + conda_env + ' python -I -m pip '
+        all_pip_deps = get_all_pip_dependencies(env_yml_pip_deps,
+            dirname(env_yml_path))
+
+        # Local pip dependencies will be uninstalled and copied in the original
+        # form as freezing breaks them (git handles their versioning after all).
+        (local_deps, local_deps_names) = get_local_pip_dependencies(all_pip_deps)
+
+        print('Installing pip dependencies...')
+        print()
+        with NamedTemporaryFile('w+', encoding='utf-8', newline='\n') as f:
+            f.write('\n'.join(env_yml_pip_deps))
+            f.flush()
+            # Possible requirements file paths are relative to `environment.yml`
+            _run(pip_cmd + 'install -r ' + f.name, cwd=dirname(env_yml_path))
+        print()
+
+        # Uninstall local packages
+        if local_deps and local_deps_names:
+            print('Uninstalling local pip dependencies (packages they depend on '
+                    + 'will stay locked)...')
+            print()
+            for local_pkg in local_deps_names:
+                _run(pip_cmd + 'uninstall --yes ' + local_pkg)
             print()
 
         pip_lock = ''
-        for pip_spec in _run('conda run -n ' + conda_env + ' python -m pip freeze',
-                return_stdout=True).split('\n'):
-            # Remove packages installed by Conda (lines: 'NAME @ file://PATH/work')
-            conda_pkg_match = match(r'(\S+) @ file://.*/work.*', pip_spec)
-            if conda_pkg_match is None:
+        for pip_spec in _run(pip_cmd + 'freeze', return_stdout=True).split('\n'):
+            if pip_spec:
+                # Ignore pip packages installed by Conda
+                # (lines: 'NAME @ file://PATH/work')
+                conda_pkg_match = match(r'(\S+) @ file://.*/work.*', pip_spec)
+                if conda_pkg_match is not None:
+                    print('Ignoring pip package installed by Conda: '
+                            + conda_pkg_match.group(1))
+                    continue
                 pip_lock += pip_spec + '\n'
-            else:
-                print('Conda package removed from pip.lock: ' + conda_pkg_match.group(1))
+
+        # Add local packages
+        if local_deps:
+            pip_lock += '\n'.join(local_deps) + '\n'
         print()
         print('Pip packages captured.')
         print()
 
+        try_updating_lock_file(pip_lock_path, pip_lock)
+
     # Conda environment isn't needed anymore
     _remove_conda_env(conda_env)
-    updated_files = []
-
-    if try_updating_lock_file(conda_lock_path, conda_lock):
-        updated_files.append(conda_lock_path)
-    if pip_lock and try_updating_lock_file(pip_lock_path, pip_lock):
-        updated_files.append(pip_lock_path)
-
-    if len(updated_files) == 0:
-        print('Both locks are up to date!')
-        exit(3)
-    else:
-        print('Locks successfully updated:')
-        for file in updated_files:
-            print('* ' + file)
-        exit(0)
 
 if __name__ == '__main__':
     main()
