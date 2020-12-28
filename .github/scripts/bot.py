@@ -178,14 +178,16 @@ def main():
         with NamedTemporaryFile('w+', encoding='utf-8', newline='\n') as f:
             f.write('\n'.join(env_yml_pip_deps))
             f.flush()
+
             # Possible requirements file paths are relative to `environment.yml`
-            _run(pip_cmd + 'install -r ' + f.name, cwd=dirname(env_yml_path))
+            env_yml_dir = dirname(env_yml_path)
+            _run(pip_cmd + 'install -r ' + f.name, cwd=env_yml_dir or '.')
         print()
 
         # Uninstall local packages
         if local_deps and local_deps_names:
-            print('Uninstalling local pip dependencies (packages they depend on '
-                    + 'will stay locked)...')
+            print('Uninstalling local pip packages (they were installed '
+                    + 'only to lock their dependencies\' versions)...')
             print()
             for local_pkg in local_deps_names:
                 _run(pip_cmd + 'uninstall --yes ' + local_pkg)
@@ -205,7 +207,7 @@ def main():
 
         # Add local packages
         if local_deps:
-            pip_lock.extend(local_deps)
+            pip_locked_pkgs.extend(local_deps)
 
         # Add locked pip packages to the `conda env export` yaml output
         if pip_locked_pkgs:
