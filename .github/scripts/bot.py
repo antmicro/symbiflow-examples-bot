@@ -200,8 +200,8 @@ def main():
                 _run(pip_cmd + 'uninstall --yes ' + local_pkg)
             print()
 
-        pip_lock = ''
-        for pip_spec in _run(pip_cmd + 'freeze', return_stdout=True).split('\n'):
+        pip_locked_pkgs = []
+        for pip_spec in _run(pip_cmd + 'freeze', return_stdout=True).splitlines():
             if pip_spec:
                 # Ignore pip packages installed by Conda
                 # (lines: 'NAME @ file://PATH/work')
@@ -210,21 +210,24 @@ def main():
                     print('Ignoring pip package installed by Conda: '
                             + conda_pkg_match.group(1))
                     continue
-                pip_lock += pip_spec + '\n'
+                pip_locked_pkgs.append(pip_spec)
 
         # Add local packages
         if local_deps:
-            pip_lock += '\n'.join(local_deps) + '\n'
+            pip_lock.extend(local_deps)
+
+        # Add locked pip packages to the `conda env export` yaml output
+        if pip_locked_pkgs:
+            conda_lock_yaml['dependencies'].append({'pip': pip_locked_pkgs})
+
         print()
         print('Pip packages captured.')
         print()
 
-        try_updating_lock_file(pip_lock_path, pip_lock)
-
     # Conda environment isn't needed anymore
     _remove_conda_env(conda_env)
 
-    # Apply yaml styling used by `conda env export`
+    # Apply yaml offset used by `conda env export`
     yaml.indent(offset=2)
     try_updating_lock_file(conda_lock_path, conda_lock_yaml)
 
