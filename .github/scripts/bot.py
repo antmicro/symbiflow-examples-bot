@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from os import environ
-from os.path import dirname, exists, isdir, join
+from os.path import dirname, exists, isdir, join, splitext
 from subprocess import run, DEVNULL, PIPE, CalledProcessError
 from sys import exit
 from re import match, search, sub
@@ -132,6 +132,13 @@ def main():
     pip_lock_path = _get_env('BOT_PIP_LOCK', required=False)
     print()
     if None in [conda_env, env_yml_path, conda_lock_path]:
+        exit(1)
+
+    # Conda only supports creating environments from .txt/.yml/.yaml files
+    _, conda_lock_ext = splitext(conda_lock_path)
+    if conda_lock_ext not in ['.txt', '.yml', '.yaml']:
+        print('ERROR: Invalid conda lock extension (`' + conda_lock_ext
+                + '`); it must be `.txt`, `.yml` or `.yaml`!')
         exit(1)
 
     (pipless_env_yml_path, env_yml_pip_deps) = extract_pip_dependencies(
