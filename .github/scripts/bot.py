@@ -25,10 +25,9 @@ def _run(cmd_string, multiword_last_arg='', return_stdout=False, **kwargs):
     else:
         return run(cmd, check=True, **kwargs)
 
-def _get_env(env_name, required=True):
+def _get_env(env_name):
     if env_name not in environ:
-        if required:
-            print('ERROR: Required environment variable not found: ' + env_name + '!')
+        print('ERROR: Required environment variable not found: ' + env_name + '!')
         return None
     env_var = environ[env_name]
     print('* ' + env_name + ': ' + env_var)
@@ -133,7 +132,6 @@ def main():
     conda_env = _get_env('BOT_ENV_NAME')
     env_yml_path = _get_env('BOT_ENV_YML')
     conda_lock_path = _get_env('BOT_CONDA_LOCK')
-    pip_lock_path = _get_env('BOT_PIP_LOCK', required=False)
     print()
     if None in [conda_env, env_yml_path, conda_lock_path]:
         exit(1)
@@ -167,13 +165,6 @@ def main():
 
     # Lock pip dependencies
     if env_yml_pip_deps:
-        if pip_lock_path is None:
-            print('ERROR: The environment uses pip dependencies but '
-                    + 'BOT_PIP_LOCK environment variable hasn\'t been set!')
-            print()
-            _remove_conda_env(conda_env)
-            exit(1)
-
         pip_cmd = 'conda run --no-capture-output -n ' + conda_env + ' python -I -m pip '
         all_pip_deps = get_all_pip_dependencies(env_yml_pip_deps,
             dirname(env_yml_path))
