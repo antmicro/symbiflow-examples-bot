@@ -90,7 +90,6 @@ and so you will need to add some ``sudo`` commands to the instructions below.
         source "$INSTALL_DIR/xc7/conda/etc/profile.d/conda.sh"
         conda env create -f xc7/conda_lock.yml -n xc7
         conda activate xc7
-        python -m pip install -r xc7/pip.lock
         mkdir -p $INSTALL_DIR/xc7/install
         wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/presubmit/install/1049/20201123-030526/symbiflow-arch-defs-install-05bd35c7.tar.xz | tar -xJC $INSTALL_DIR/xc7/install
         mkdir -p $INSTALL_DIR/xc7/install/share/symbiflow/arch
@@ -105,7 +104,7 @@ and so you will need to add some ``sudo`` commands to the instructions below.
 
         bash conda_installer.sh -b -p $INSTALL_DIR/eos-s3/conda
         source "$INSTALL_DIR/eos-s3/conda/etc/profile.d/conda.sh"
-        conda env create -f eos-s3/environment.yml
+        conda env create -f eos-s3/conda_lock.yml -n eos-s3
         conda activate eos-s3
         wget -qO- https://quicklogic-my.sharepoint.com/:u:/p/kkumar/EWuqtXJmalROpI2L5XeewMIBRYVCY8H4yc10nlli-Xq79g?download=1 | tar -xJ -C $INSTALL_DIR/eos-s3/
         conda deactivate

@@ -41,7 +41,6 @@ Choose the installation directory (see the `README <../README.rst>`_ one level u
         source "$INSTALL_DIR/xc7/conda/etc/profile.d/conda.sh"
         conda env create -f xc7/conda_lock.yml -n xc7
         conda activate xc7
-        python -m pip install -r xc7/pip.lock
         mkdir -p $INSTALL_DIR/xc7/install
         wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/presubmit/install/1049/20201123-030526/symbiflow-arch-defs-install-05bd35c7.tar.xz | tar -xJC $INSTALL_DIR/xc7/install
         mkdir -p $INSTALL_DIR/xc7/install/share/symbiflow/arch
