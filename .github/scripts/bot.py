@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from io import StringIO
 from os import environ
 from os.path import dirname, exists, isdir, join, splitext
 from subprocess import run, DEVNULL, PIPE, CalledProcessError
@@ -41,8 +42,11 @@ def _remove_conda_env(conda_env_name):
     print()
 
 # Returns True if lock file has been updated, False otherwise
-def try_updating_lock_file(path, new_lock):
+def try_updating_lock_file(path, lock_yml):
     print('Trying to update `' + path + '`...')
+    with StringIO() as tmp_stream:
+        yaml.dump(lock_yml, tmp_stream)
+        new_lock = tmp_stream.getvalue()
     try:
         with open(path, 'r') as f:
             old_lock = f.read()
@@ -155,7 +159,9 @@ def main():
         print()
         exit(1)
 
-    _run('conda run -n ' + conda_env + ' conda env export -f ' + conda_lock_path)
+    conda_lock = _run('conda run -n ' + conda_env + ' conda env export',
+            return_stdout=True)
+    conda_lock_yaml = yaml.load(conda_lock)
     print('Conda packages captured.')
     print()
 
@@ -217,6 +223,10 @@ def main():
 
     # Conda environment isn't needed anymore
     _remove_conda_env(conda_env)
+
+    # Apply yaml styling used by `conda env export`
+    yaml.indent(offset=2)
+    try_updating_lock_file(conda_lock_path, conda_lock_yaml)
 
 if __name__ == '__main__':
     main()
