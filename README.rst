@@ -88,7 +88,7 @@ and so you will need to add some ``sudo`` commands to the instructions below.
 
         bash conda_installer.sh -b -p $INSTALL_DIR/xc7/conda
         source "$INSTALL_DIR/xc7/conda/etc/profile.d/conda.sh"
-        conda create --file xc7/conda.lock -n xc7
+        conda env create -f xc7/conda.lock -n xc7
         conda activate xc7
         python -m pip install -r xc7/pip.lock
         mkdir -p $INSTALL_DIR/xc7/install
