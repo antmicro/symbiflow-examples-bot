@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { branch_name: 'update_xc7', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda.lock', pip_lock: 'xc7/pip.lock' }
+          - { branch_name: 'update_xc7', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda_lock.yml', pip_lock: 'xc7/pip.lock' }
           - { branch_name: 'update_eos-s3', env_yml: 'eos-s3/environment.yml', conda_lock: 'eos-s3/conda.lock', pip_lock: 'eos-s3/pip.lock' }
     env:
       BOT_BRANCH:     ${{ matrix.branch_name }}_${{ github.run_id }}
