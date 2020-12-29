@@ -1,4 +1,4 @@
-name: update_conda_lock
+name: update_conda_locks
 
 on:
   workflow_dispatch:
@@ -27,7 +27,7 @@ jobs:
 
     - name: Push Updated Lock
       id: update-lock
-      uses: antmicro/symbiflow-examples-bot/.github/conda_locking_bot
+      uses: antmicro/symbiflow-examples-bot/.github/conda_locking_bot@581804017703c9b08a131178cc3c5a9eb1c930d8
       with:
         branch_name:      ${{ env.PR_BRANCH }}
         environment_file: ${{ matrix.env_yml }}
