@@ -98,7 +98,7 @@ def extract_pip_dependencies(env_yml_path):
     return (env_yml_path, env_yml_pip_dependencies)
 
 
-def get_local_pip_dependencies(pip_dependencies):
+def get_local_pip_dependencies(pip_dependencies, root_dir):
     local_pip_dependencies = []
     local_pip_deps_names = []
     for dependency in pip_dependencies:
@@ -110,13 +110,15 @@ def get_local_pip_dependencies(pip_dependencies):
 
         # Find core of the dependency line without version etc.
         core_match = search(r'(^|\s)([^\s-][^\s=<>~!;]+)', only_dependency)
-        if core_match is not None and isdir(core_match.group(2)):
-            setup_path = join(core_match.group(2), 'setup.py')
-            if exists(setup_path):
-                dependency_name = _run('python setup.py --name',
-                        cwd=core_match.group(2), return_stdout=True).strip()
-                local_pip_deps_names.append(dependency_name)
-                local_pip_dependencies.append(dependency)
+        if core_match is not None:
+            dependency_path = join(root_dir, core_match.group(2))
+            if isdir(dependency_path):
+                setup_path = join(dependency_path, 'setup.py')
+                if exists(setup_path):
+                    dependency_name = _run('python setup.py --name',
+                            cwd=dependency_path, return_stdout=True).strip()
+                    local_pip_deps_names.append(dependency_name)
+                    local_pip_dependencies.append(dependency)
     return (local_pip_dependencies, local_pip_deps_names)
 
 
@@ -179,7 +181,8 @@ def main():
 
             # Local pip dependencies will be uninstalled and copied in the original
             # form as freezing breaks them (git handles their versioning after all).
-            (local_deps, local_deps_names) = get_local_pip_dependencies(all_pip_deps)
+            (local_deps, local_deps_names) = get_local_pip_dependencies(
+                    all_pip_deps, dirname(env_yml_path))
 
             print('Installing pip dependencies...')
             print()
