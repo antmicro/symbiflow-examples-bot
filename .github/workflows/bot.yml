@@ -27,7 +27,7 @@ jobs:
       id: update-lock
       uses: antmicro/symbiflow-examples-bot/.github/bot@action
       with:
-        branch_name:      "$PR_BRANCH"
+        branch_name:      ${{ env.PR_BRANCH }}
         environment_file: ${{ matrix.env_yml }}
         conda_lock_file:  ${{ matrix.conda_lock }}
 
@@ -48,7 +48,7 @@ jobs:
           github.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            head: `${ process.env.PR_BRANCH }`,
+            head: `${{ env.PR_BRANCH }}`,
             base: `${{ matrix.pr_base }}`,
-            title: `${ process.env.PR_TITLE }`,
+            title: `${{ env.PR_TITLE }}`,
           })
