@@ -1,0 +1,83 @@
+name: 'Conda Lock Updating Bot'
+description: 'Create A Pull Request Updating Conda And Pip Packages'
+
+inputs:
+  commit_message:
+    description: 'Message of the bump commit'
+    required: true
+    default: '[BOT] Bump locks'
+  user_name:
+    description: 'Name of the user creating commit'
+    required: true
+    default: 'LOCK_UPDATING_BOT'
+  user_email:
+    description: 'Email address of the user creating commit'
+    required: true
+    default: '<>'
+  branch_name:
+    description: "Name of the pushed branch; it will be suffixed with GH Action's Run ID"
+    required: true
+    default: 'update_lock'
+  environment_file:
+    description: 'Path of the `environment.yml` file'
+    required: true
+    default: 'environment.yml'
+  conda_lock_file:
+    description: 'Path of the Conda Lock file (needs to have txt/yml/yaml extension)'
+    required: true
+    default: 'conda_lock.yml'
+  conda_env_name:
+    description: 'Name of the internally created Conda Environment'
+    required: true
+    default: 'bot_env'
+
+runs:
+  using: "composite"
+  steps:
+  - shell: bash
+    run: |
+      echo "::group::Check git"
+      which git
+      git --version
+      echo "::endgroup::"
+      echo "::group::Check conda"
+      which conda
+      conda -V
+      echo
+      echo "Packages in the current environment:"
+      conda list
+      echo "::endgroup::"
+      echo "::group::Check python"
+      which python3
+      python3 -V
+      echo
+      echo "Python modules installed in pip:"
+      python3 -m pip list
+      echo "::endgroup::"
+      echo "::group::Create New Branch"
+      git checkout -b "$BOT_BRANCH"
+      echo "::endgroup::"
+      echo "::group::Install ruamel.yaml"
+      python3 -m pip install ruamel.yaml
+      echo "::endgroup::"
+      echo "::group::Update Conda Lock"
+      python3 .github/scripts/bot.py
+      echo $?
+      echo "::endgroup::"
+      echo "::group::Add And Commit Changes"
+      git config user.name "$USER_NAME"
+      git config user.email "$USER_EMAIL"
+      git add "$BOT_CONDA_LOCK"
+      git commit -m "$COMMIT_MESSAGE"
+      echo "::endgroup::"
+      echo "::group::Push Changes"
+      git push -u origin "$BOT_BRANCH"
+      echo "::endgroup::"
+    env:
+      BOT_BRANCH:     ${{ inputs.branch_name }}_${{ github.run_id }}
+      BOT_CONDA_LOCK: ${{ inputs.conda_lock_file }}
+      BOT_ENV_NAME:   ${{ inputs.conda_env_name }}
+      BOT_ENV_YML:    ${{ inputs.environment_file }}
+      COMMIT_MESSAGE: ${{ inputs.commit_message }}
+      USER_EMAIL:     ${{ inputs.user_email }}
+      USER_NAME:      ${{ inputs.user_name }}
