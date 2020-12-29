@@ -23,17 +23,21 @@ jobs:
         submodules:  'recursive'
         ref:         ${{ matrix.pr_base }}
 
-    - name: Run Action
+    - name: Push Updated Lock
+      id: update-lock
       uses: antmicro/symbiflow-examples-bot/.github/bot@action
       with:
         branch_name:      "$PR_BRANCH"
         environment_file: ${{ matrix.env_yml }}
         conda_lock_file:  ${{ matrix.conda_lock }}
 
+    - name: Stop Workflow if Lock is Up To Date
+      run: if [ "${{ steps.update-lock.outputs.lock_up_to_date }}" = "true" ]; then exit; fi
+
     - name: Set PR_TITLE with current UTC time
       run: echo "PR_TITLE=${{ matrix.pr_prefix}} $(date -u +'%Y-%m-%d %H:%M %p %Z')" >> $GITHUB_ENV
 
-    - name: Create A Pull Request
+    - name: Create a Pull Request
       uses: actions/github-script@v3
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}

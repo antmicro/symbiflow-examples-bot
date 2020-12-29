@@ -1,5 +1,5 @@
-name: 'Conda Lock Updating Bot'
-description: 'Create A Pull Request Updating Conda And Pip Packages'
+name: 'Conda Lock Updating Action'
+description: 'Action Pushes a Branch with Conda Lock Update'
 
 inputs:
   commit_message:
@@ -31,10 +31,16 @@ inputs:
     required: true
     default: 'bot_env'
 
+outputs:
+  lock_up_to_date:
+    description: 'Is current Conda Lock up to date (`true` / `false`)'
+    value: ${{ steps.lock-update.outputs.lock_up_to_date }}
+
 runs:
   using: "composite"
   steps:
-  - shell: bash
+  - id: lock-update
+    shell: bash
     run: |
       echo "::group::Check git"
       which git
@@ -61,8 +67,15 @@ runs:
       python3 -m pip install ruamel.yaml
       echo "::endgroup::"
       echo "::group::Update Conda Lock"
-      python3 .github/scripts/bot.py
-      echo $?
+      EXIT_CODE=0
+      python3 .github/scripts/bot.py || EXIT_CODE=$?
+      echo "::set-output name=lock_up_to_date::false"
+      if [ $EXIT_CODE -eq 3 ]; then                      \
+        echo "::set-output name=lock_up_to_date::true";  \
+        exit 0;                                          \
+      elif [ $EXIT_CODE -ne 0 ]; then                    \
+        exit $EXIT_CODE;                                 \
+      fi
       echo "::endgroup::"
       echo "::group::Add And Commit Changes"
       git config user.name "$USER_NAME"
