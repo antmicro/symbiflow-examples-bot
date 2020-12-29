@@ -45,12 +45,6 @@ dependencies:
   - xz=5.2.5=h7b6447c_0
   - zlib=1.2.11=h7b6447c_3
   - pip:
-    - Arpeggio==1.10.1
-    - certifi==2020.12.5
-    - fasm @ git+https://github.com/symbiflow/fasm@bae2e6dd782026d9db3e4e00ef535d1b5858322d
-    - prjxray @ git+git://github.com/SymbiFlow/prjxray.git@77e8b24c883bd527b511413f1939c3a34a237c1c
-    - python-constraint==1.4.0
-    - textX==2.3.0
-    - xc-fasm @ git+https://github.com/symbiflow/xc-fasm@e12f31334e96fedf3af86d13cf51f70ad2270f5f
+    - Arpeggio
 prefix: /usr/share/miniconda/envs/bot_env
 
