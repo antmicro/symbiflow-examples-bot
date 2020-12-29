@@ -2,11 +2,7 @@ name: bot
 
 on:
   workflow_dispatch:
-    inputs:
-      pr_title:
-        description: 'Title of the Pull Request'
-        required: true
-        default: '[BOT] Bump locks'
+  push:
 
 jobs:
   update-locks:
@@ -15,23 +11,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { branch_name: 'update_xc7', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda_lock.yml' }
-          - { branch_name: 'update_eos-s3', env_yml: 'eos-s3/environment.yml', conda_lock: 'eos-s3/conda_lock.yml' }
+          - { branch_name: 'update_xc7', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda_lock.yml', pr_base: 'master', pr_prefix: '[BOT] Bump xc7 lock' }
+          - { branch_name: 'update_eos-s3', env_yml: 'eos-s3/environment.yml', conda_lock: 'eos-s3/conda_lock.yml', pr_base: 'master', pr_prefix: '[BOT] Bump eos-s3 lock' }
     env:
-      BOT_BRANCH:     ${{ matrix.branch_name }}_${{ github.run_id }}
+      PR_BRANCH:  ${{ matrix.branch_name }}_${{ github.run_id }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
         submodules:  'recursive'
+        ref:         ${{ matrix.pr_base }}
 
     - name: Run Action
-      uses: ./.github/bot
+      uses: antmicro/symbiflow-examples-bot/.github/bot@action
       with:
-        branch_name:      ${{ matrix.branch_name }}
+        branch_name:      "$PR_BRANCH"
         environment_file: ${{ matrix.env_yml }}
         conda_lock_file:  ${{ matrix.conda_lock }}
+
+    - name: Set PR_TITLE with current UTC time
+      run: echo "PR_TITLE=${{ matrix.pr_prefix}} $(date -u +'%Y-%m-%d %H:%M %p %Z')" >> $GITHUB_ENV
 
     - name: Create A Pull Request
       uses: actions/github-script@v3
@@ -41,7 +41,7 @@ jobs:
           github.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            head: `${process.env.BOT_BRANCH}`,
-            base: "master",
-            title: `${{ github.event.inputs.pr_title }}`,
+            head: `${ process.env.PR_BRANCH }`,
+            base: `${{ matrix.pr_base }}`,
+            title: `${ process.env.PR_TITLE }`,
           })

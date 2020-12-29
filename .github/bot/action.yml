@@ -74,7 +74,7 @@ runs:
       git push -u origin "$BOT_BRANCH"
       echo "::endgroup::"
     env:
-      BOT_BRANCH:     ${{ inputs.branch_name }}_${{ github.run_id }}
+      BOT_BRANCH:     ${{ inputs.branch_name }}
       BOT_CONDA_LOCK: ${{ inputs.conda_lock_file }}
       BOT_ENV_NAME:   ${{ inputs.conda_env_name }}
       BOT_ENV_YML:    ${{ inputs.environment_file }}
