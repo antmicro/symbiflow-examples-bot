@@ -67,16 +67,15 @@ runs:
       python3 -m pip install ruamel.yaml
       echo "::endgroup::"
       echo "::group::Update Conda Lock"
-      set -x
       EXIT_CODE=0
       python3 $GITHUB_ACTION_PATH/update_lock.py || EXIT_CODE=$?
+      echo "Script returned code: $EXIT_CODE"
       echo "::set-output name=lock_up_to_date::false"
-      echo "$EXIT_CODE"
-      if [ $EXIT_CODE -eq 3 ]; then                      \
-        echo "::set-output name=lock_up_to_date::true";  \
-        exit 0;                                          \
-      elif [ $EXIT_CODE -ne 0 ]; then                    \
-        exit $EXIT_CODE;                                 \
+      if [ $EXIT_CODE -eq 3 ]; then
+        echo "::set-output name=lock_up_to_date::true"
+        exit 0
+      elif [ $EXIT_CODE -ne 0 ]; then
+        exit $EXIT_CODE
       fi
       echo "::endgroup::"
       echo "::group::Add And Commit Changes"
