@@ -65,4 +65,3 @@ dependencies:
     - textX==2.3.0
 prefix: /usr/share/miniconda/envs/bot_env
 
-
