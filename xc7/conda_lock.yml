@@ -54,4 +54,3 @@ dependencies:
     - xc-fasm @ git+https://github.com/symbiflow/xc-fasm@e12f31334e96fedf3af86d13cf51f70ad2270f5f
 prefix: /usr/share/miniconda/envs/bot_env
 
-
