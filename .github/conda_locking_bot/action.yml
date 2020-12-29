@@ -26,10 +26,6 @@ inputs:
     description: 'Path of the Conda Lock file (needs to have txt/yml/yaml extension)'
     required: true
     default: 'conda_lock.yml'
-  conda_env_name:
-    description: 'Name of the internally created Conda Environment'
-    required: true
-    default: 'bot_env'
 
 outputs:
   lock_up_to_date:
@@ -90,7 +86,6 @@ runs:
     env:
       BOT_BRANCH:     ${{ inputs.branch_name }}
       BOT_CONDA_LOCK: ${{ inputs.conda_lock_file }}
-      BOT_ENV_NAME:   ${{ inputs.conda_env_name }}
       BOT_ENV_YML:    ${{ inputs.environment_file }}
       COMMIT_MESSAGE: ${{ inputs.commit_message }}
       USER_EMAIL:     ${{ inputs.user_email }}

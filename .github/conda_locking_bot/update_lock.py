@@ -50,6 +50,7 @@ def try_updating_lock_file(path, lock_yml):
         print(path + ' doesn\'t exist; it will be created.')
     with open(path, 'w') as f:
         f.write(new_lock)
+    print(path + ' has been updated successfully!')
     print()
     return True
 
@@ -95,7 +96,7 @@ def extract_pip_dependencies(env_yml_path):
             env_yml_path = 'bot-env.yml'
             with open(env_yml_path, 'w') as f:
                 yaml.dump(env_yml, f)
-    return (env_yml_path, env_yml_pip_dependencies)
+    return (env_yml['name'], env_yml_path, env_yml_pip_dependencies)
 
 
 def get_local_pip_dependencies(pip_dependencies, root_dir):
@@ -149,11 +150,10 @@ class CondaEnvironmentContext:
 
 def main():
     print('Environment variables used are:')
-    conda_env = _get_env('BOT_ENV_NAME')
     env_yml_path = _get_env('BOT_ENV_YML')
     conda_lock_path = _get_env('BOT_CONDA_LOCK')
     print()
-    if None in [conda_env, env_yml_path, conda_lock_path]:
+    if None in [env_yml_path, conda_lock_path]:
         exit(1)
 
     # Conda only supports creating environments from .txt/.yml/.yaml files
@@ -163,7 +163,7 @@ def main():
                 + '`); it must be `.txt`, `.yml` or `.yaml`!')
         exit(1)
 
-    (pipless_env_yml_path, env_yml_pip_deps) = extract_pip_dependencies(
+    (conda_env, pipless_env_yml_path, env_yml_pip_deps) = extract_pip_dependencies(
             env_yml_path)
 
     with CondaEnvironmentContext(conda_env, pipless_env_yml_path):
