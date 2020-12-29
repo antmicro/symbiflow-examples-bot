@@ -230,7 +230,8 @@ def main():
 
     # Apply yaml offset used by `conda env export`
     yaml.indent(offset=2)
-    try_updating_lock_file(conda_lock_path, conda_lock_yaml)
+    if not try_updating_lock_file(conda_lock_path, conda_lock_yaml):
+        exit(3)
 
 if __name__ == '__main__':
     main()
