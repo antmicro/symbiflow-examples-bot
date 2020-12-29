@@ -69,7 +69,7 @@ runs:
       echo "::group::Update Conda Lock"
       set -x
       EXIT_CODE=0
-      python3 $/.github/scripts/bot.py || EXIT_CODE=$?
+      python3 $GITHUB_ACTION_PATH/update_lock.py || EXIT_CODE=$?
       echo "::set-output name=lock_up_to_date::false"
       echo "$EXIT_CODE"
       if [ $EXIT_CODE -eq 3 ]; then                      \

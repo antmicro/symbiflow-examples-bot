@@ -31,13 +31,16 @@ jobs:
         environment_file: ${{ matrix.env_yml }}
         conda_lock_file:  ${{ matrix.conda_lock }}
 
-    - name: Stop Workflow if Lock is Up To Date
-      run: if [ "${{ steps.update-lock.outputs.lock_up_to_date }}" = "true" ]; then exit; fi
+    - name: Lock is Up To Date
+      if: ${{ steps.update-lock.outputs.lock_up_to_date == 'true' }}
+      run: echo "Conda Lock ${{ matrix.conda_lock }} is up to date!"
 
     - name: Set PR_TITLE with current UTC time
+      if: ${{ steps.update-lock.outputs.lock_up_to_date == 'false' }}
       run: echo "PR_TITLE=${{ matrix.pr_prefix}} $(date -u +'%Y-%m-%d %H:%M %p %Z')" >> $GITHUB_ENV
 
     - name: Create a Pull Request
+      if: ${{ steps.update-lock.outputs.lock_up_to_date == 'false' }}
       uses: actions/github-script@v3
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
