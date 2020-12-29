@@ -25,7 +25,7 @@ jobs:
 
     - name: Push Updated Lock
       id: update-lock
-      uses: antmicro/symbiflow-examples-bot/.github/bot@action
+      uses: antmicro/symbiflow-examples-bot/.github/bot@da6f073f0a24000ab3b06f8b493af0c893ad7a85
       with:
         branch_name:      "$PR_BRANCH"
         environment_file: ${{ matrix.env_yml }}
