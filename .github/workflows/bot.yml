@@ -1,8 +1,10 @@
-name: bot
+name: update_conda_lock
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
+  schedule:
+    - cron: '0 17 * * *'
 
 jobs:
   update-locks:
