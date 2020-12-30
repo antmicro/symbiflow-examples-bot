@@ -16,16 +16,16 @@ jobs:
           - { branch_name: 'update_xc7', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda_lock.yml', pr_base: 'master', pr_title: '[BOT] Bump xc7 lock' }
           - { branch_name: 'update_eos-s3', env_yml: 'eos-s3/environment.yml', conda_lock: 'eos-s3/conda_lock.yml', pr_base: 'master', pr_title: '[BOT] Bump eos-s3 lock' }
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
         submodules:  'recursive'
         ref:         ${{ matrix.pr_base }}
 
-    - name: Push Updated Lock
+    - name: Update Lock and Issue a Pull Request
       id: update-lock
-      uses: antmicro/symbiflow-examples-bot/.github/conda_locking_bot@master
+      uses: antmicro/actions/update_conda_lock@a742ec5
       with:
         branch_name:      ${{ matrix.branch_name }}
         conda_lock_file:  ${{ matrix.conda_lock }}
