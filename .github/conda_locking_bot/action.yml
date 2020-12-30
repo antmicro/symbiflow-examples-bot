@@ -40,7 +40,6 @@ runs:
   - id: lock-update
     shell: bash
     run: |
-      set -x
       echo "::group::Check git"
       which git
       git --version
@@ -64,11 +63,13 @@ runs:
       curl -V
       echo "::endgroup::"
       echo "::group::Capture Base Branch Name"
+      set -x
       PR_BASE=$(git branch --show-current)
       if [ "$PR_BASE" = "" ]; then
         echo "Capturing base branch failed!"
         exit 1
       fi
+      set +x
       echo "::endgroup::"
       echo "::group::Create New Branch"
       git checkout -b "$BRANCH_NAME"
@@ -77,6 +78,7 @@ runs:
       python3 -m pip install ruamel.yaml
       echo "::endgroup::"
       echo "::group::Update Conda Lock"
+      set -x
       EXIT_CODE=0
       python3 $GITHUB_ACTION_PATH/update_lock.py || EXIT_CODE=$?
       echo "Script returned code: $EXIT_CODE"
@@ -85,29 +87,39 @@ runs:
       elif [ $EXIT_CODE -ne 0 ]; then
         exit $EXIT_CODE
       fi
+      set +x
       echo "::endgroup::"
       echo "::group::Add And Commit Changes"
+      set -x
       git config user.name "${{ inputs.user_name }}"
       git config user.email "${{ inputs.user_email }}"
       git add "$BOT_CONDA_LOCK"
       git commit -m "${{ inputs.commit_message }}"
+      set +x
       echo "::endgroup::"
       echo "::group::Push Changes"
       git push -u origin "$BRANCH_NAME"
       echo "::endgroup::"
       echo "::group::Create a Pull Request"
+      set -x
       PR_TITLE="${{ inputs.pr_title }} $(date -u +'%Y-%m-%d %H:%M %p %Z')"
-      curl -X POST \
+      # The response's HTTP status code will be printed to the STDERR
+      curl -w "%{stderr}%{response_code}" -X POST \
         -H "Authorization: token ${{ inputs.github_token }}" \
         -H "Accept: application/vnd.github.v3+json" \
         https://api.github.com/repos/${{ github.repository }}/pulls \
         -d "{
           \"head\":  \"$BRANCH_NAME\",
           \"base\":  \"$PR_BASE\",
-          \"title\": \"$PR_TITLE\"
-        }"
-      echo "::endgroup::"
+          \"title\": \"$PR_TITLE\",
+        }" 2>code.txt
+      if ! [ "$(cat code.txt)" = "201" ]; then
+        echo "Pull Request creation failed! Captured curl's STDERR:"
+        cat code.txt
+        echo
+      fi
       set +x
+      echo "::endgroup::"
     env:
       BOT_CONDA_LOCK: ${{ inputs.conda_lock_file }}
       BOT_ENV_YML:    ${{ inputs.environment_file }}
