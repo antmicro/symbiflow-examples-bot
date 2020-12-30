@@ -25,7 +25,7 @@ jobs:
 
     - name: Push Updated Lock
       id: update-lock
-      uses: antmicro/symbiflow-examples-bot/.github/conda_locking_bot@master
+      uses: antmicro/actions/update_conda_lock@add_conda_locker
       with:
         branch_name:      ${{ matrix.branch_name }}
         conda_lock_file:  ${{ matrix.conda_lock }}
