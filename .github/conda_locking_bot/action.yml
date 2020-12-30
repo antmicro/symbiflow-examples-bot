@@ -5,11 +5,11 @@ inputs:
   commit_message:
     description: 'Message of the bump commit'
     required: true
-    default: '[BOT] Bump locks'
+    default: '[BOT] Bump Conda Lock'
   user_name:
     description: 'Name of the user creating commit'
     required: true
-    default: 'LOCK_UPDATING_BOT'
+    default: 'CONDA_LOCK_UPDATING_BOT'
   user_email:
     description: 'Email address of the user creating commit'
     required: true
@@ -26,11 +26,13 @@ inputs:
     description: 'Path of the Conda Lock file (needs to have txt/yml/yaml extension)'
     required: true
     default: 'conda_lock.yml'
-
-outputs:
-  lock_up_to_date:
-    description: 'Is current Conda Lock up to date (`true` / `false`)'
-    value: ${{ steps.lock-update.outputs.lock_up_to_date }}
+  pr_title:
+    description: 'Title of the Pull Request; it will be suffixed with UTC time and date'
+    required: true
+    default: '[BOT] Bump Conda Lock'
+  github_token:
+    description: 'GitHub Access Token; use Private Access Token to trigger workflows issuing the Pull Request'
+    required: true
 
 runs:
   using: "composite"
@@ -38,6 +40,7 @@ runs:
   - id: lock-update
     shell: bash
     run: |
+      set -x
       echo "::group::Check git"
       which git
       git --version
@@ -56,8 +59,19 @@ runs:
       echo "Python modules installed in pip:"
       python3 -m pip list
       echo "::endgroup::"
+      echo "::group::Check curl"
+      which curl
+      curl -V
+      echo "::endgroup::"
+      echo "::group::Capture Base Branch Name"
+      PR_BASE=$(git branch --show-current)
+      if [ "$PR_BASE" = "" ]; then
+        echo "Capturing base branch failed!"
+        exit 1
+      fi
+      echo "::endgroup::"
       echo "::group::Create New Branch"
-      git checkout -b "$BOT_BRANCH"
+      git checkout -b "$BRANCH_NAME"
       echo "::endgroup::"
       echo "::group::Install ruamel.yaml"
       python3 -m pip install ruamel.yaml
@@ -66,27 +80,35 @@ runs:
       EXIT_CODE=0
       python3 $GITHUB_ACTION_PATH/update_lock.py || EXIT_CODE=$?
       echo "Script returned code: $EXIT_CODE"
-      echo "::set-output name=lock_up_to_date::false"
       if [ $EXIT_CODE -eq 3 ]; then
-        echo "::set-output name=lock_up_to_date::true"
         exit 0
       elif [ $EXIT_CODE -ne 0 ]; then
         exit $EXIT_CODE
       fi
       echo "::endgroup::"
       echo "::group::Add And Commit Changes"
-      git config user.name "$USER_NAME"
-      git config user.email "$USER_EMAIL"
+      git config user.name "${{ inputs.user_name }}"
+      git config user.email "${{ inputs.user_email }}"
       git add "$BOT_CONDA_LOCK"
-      git commit -m "$COMMIT_MESSAGE"
+      git commit -m "${{ inputs.commit_message }}"
       echo "::endgroup::"
       echo "::group::Push Changes"
-      git push -u origin "$BOT_BRANCH"
+      git push -u origin "$BRANCH_NAME"
       echo "::endgroup::"
+      echo "::group::Create a Pull Request"
+      PR_TITLE="${{ inputs.pr_title }} $(date -u +'%Y-%m-%d %H:%M %p %Z')"
+      curl -X POST \
+        -H "Authorization: token ${{ inputs.github_token }}" \
+        -H "Accept: application/vnd.github.v3+json" \
+        https://api.github.com/repos/${{ github.repository }}/pulls \
+        -d "{
+          \"head\":  \"$BRANCH_NAME\",
+          \"base\":  \"$PR_BASE\",
+          \"title\": \"$PR_TITLE\"
+        }"
+      echo "::endgroup::"
+      set +x
     env:
-      BOT_BRANCH:     ${{ inputs.branch_name }}
       BOT_CONDA_LOCK: ${{ inputs.conda_lock_file }}
       BOT_ENV_YML:    ${{ inputs.environment_file }}
-      COMMIT_MESSAGE: ${{ inputs.commit_message }}
-      USER_EMAIL:     ${{ inputs.user_email }}
-      USER_NAME:      ${{ inputs.user_name }}
+      BRANCH_NAME:    ${{ inputs.branch_name }}_${{ github.run_id }}
