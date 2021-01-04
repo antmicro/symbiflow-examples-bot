@@ -1,4 +1,4 @@
-name: bot_env
+name: eos-s3
 channels:
   - litex-hub
   - conda-forge
@@ -13,7 +13,7 @@ dependencies:
   - curl=7.71.1=he644dc0_8
   - expat=2.2.9=he1b5a44_2
   - gettext=0.19.8.1=h0b5b191_1005
-  - git=2.29.2=pl5320h78be0e9_1
+  - git=2.30.0=pl5320h014a29a_0
   - icu=68.1=h58526e2_0
   - intervaltree=3.0.2=py_0
   - krb5=1.17.2=h926e7f8_0
@@ -48,7 +48,7 @@ dependencies:
   - sortedcontainers=2.3.0=pyhd8ed1ab_0
   - sqlite=3.34.0=h74cdb3f_0
   - symbiflow-vtr=8.0.0rc2_4003_g8980e4621=20200902_114536
-  - tbb=2020.2=h4bd325d_1
+  - tbb=2020.2=h4bd325d_2
   - tk=8.6.10=h21135ba_1
   - util-linux=2.36=py37hce60a50_0
   - wheel=0.36.2=pyhd3deb0d_0
@@ -63,5 +63,5 @@ dependencies:
     - python-constraint==1.4.0
     - quicklogic-fasm @ git+https://github.com/QuickLogic-Corp/quicklogic-fasm@2312ff03d5690449a597e565430764a162d452b7
     - textX==2.3.0
-prefix: /usr/share/miniconda/envs/bot_env
+prefix: /usr/share/miniconda/envs/eos-s3
 
