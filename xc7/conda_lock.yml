@@ -1,4 +1,4 @@
-name: bot_env
+name: xc7
 channels:
   - litex-hub
   - defaults
@@ -32,7 +32,7 @@ dependencies:
   - prjxray-tools=0.1_2697_g0f939808=20201120_145821
   - python=3.8.5=h7579374_1
   - readline=8.0=h7b6447c_0
-  - setuptools=51.0.0=py38h06a4308_2
+  - setuptools=51.1.2=py38h06a4308_3
   - simplejson=3.17.2=py38h7b6447c_0
   - sortedcontainers=2.3.0=pyhd3eb1b0_0
   - sqlite=3.33.0=h62c20be_0
@@ -45,6 +45,12 @@ dependencies:
   - xz=5.2.5=h7b6447c_0
   - zlib=1.2.11=h7b6447c_3
   - pip:
-    - Arpeggio
-prefix: /usr/share/miniconda/envs/bot_env
+    - Arpeggio==1.10.1
+    - certifi==2020.12.5
+    - fasm @ git+https://github.com/symbiflow/fasm@bae2e6dd782026d9db3e4e00ef535d1b5858322d
+    - prjxray @ git+git://github.com/SymbiFlow/prjxray.git@77e8b24c883bd527b511413f1939c3a34a237c1c
+    - python-constraint==1.4.0
+    - textX==2.3.0
+    - xc-fasm @ git+https://github.com/symbiflow/xc-fasm@e12f31334e96fedf3af86d13cf51f70ad2270f5f
+prefix: /usr/share/miniconda/envs/xc7
 
