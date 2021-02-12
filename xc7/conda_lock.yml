@@ -1,10 +1,11 @@
-name: bot_env
+name: xc7
 channels:
   - litex-hub
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
-  - ca-certificates=2020.12.8=h06a4308_0
+  - _openmp_mutex=4.5=1_gnu
+  - ca-certificates=2021.1.19=h06a4308_0
   - certifi=2020.12.5=py38h06a4308_0
   - dummy-pkg=0.0=b1
   - expat=2.2.10=he6710b0_2
@@ -12,13 +13,14 @@ dependencies:
   - icu=58.2=he6710b0_3
   - intervaltree=3.1.0=py_0
   - krb5=1.18.2=h173b8e3_0
-  - ld_impl_linux-64=2.33.1=h53a641e_7
+  - ld_impl_linux-64=2.35.1=h2b15070_1
   - libcurl=7.71.1=h20c2e04_1
   - libedit=3.1.20191231=h14c3975_1
   - libffi=3.3=he6710b0_2
-  - libgcc-ng=9.1.0=hdf63c60_0
+  - libgcc-ng=9.3.0=h9cbead1_17
+  - libgomp=9.3.0=h9cbead1_17
   - libssh2=1.9.0=h1ba5d50_1
-  - libstdcxx-ng=9.1.0=hdf63c60_0
+  - libstdcxx-ng=9.3.0=h2ae2ef3_17
   - libxml2=2.9.10=hb55368b_3
   - libxslt=1.1.34=hc22bd24_0
   - lxml=4.6.2=py38h9120a33_0
@@ -31,8 +33,8 @@ dependencies:
   - prjxray-db=0.0_0239_gd87c844=20201120_145821
   - prjxray-tools=0.1_2697_g0f939808=20201120_145821
   - python=3.8.5=h7579374_1
-  - readline=8.0=h7b6447c_0
-  - setuptools=51.0.0=py38h06a4308_2
+  - readline=8.1=h27cfd23_0
+  - setuptools=52.0.0=py38h06a4308_0
   - simplejson=3.17.2=py38h7b6447c_0
   - sortedcontainers=2.3.0=pyhd3eb1b0_0
   - sqlite=3.33.0=h62c20be_0
@@ -45,6 +47,12 @@ dependencies:
   - xz=5.2.5=h7b6447c_0
   - zlib=1.2.11=h7b6447c_3
   - pip:
-    - Arpeggio
-prefix: /usr/share/miniconda/envs/bot_env
+    - Arpeggio==1.10.1
+    - certifi==2020.12.5
+    - fasm @ git+https://github.com/symbiflow/fasm@bae2e6dd782026d9db3e4e00ef535d1b5858322d
+    - prjxray @ git+git://github.com/SymbiFlow/prjxray.git@953f8745ba039d09cf739e3dbd5e1c99727c128f
+    - python-constraint==1.4.0
+    - textX==2.3.0
+    - xc-fasm @ git+https://github.com/symbiflow/xc-fasm@e12f31334e96fedf3af86d13cf51f70ad2270f5f
+prefix: /usr/share/miniconda/envs/xc7
 
