@@ -24,11 +24,10 @@ jobs:
         ref:         ${{ matrix.pr_base }}
 
     - name: Update Lock and Issue a Pull Request
-      id: update-lock
-      uses: antmicro/actions/update_conda_lock@ae1b1b9
+      uses: antmicro/actions/update_conda_lock@4a1990502cd287a505e75e30301ccdeb26872606
       with:
-        branch_name:      ${{ matrix.branch_name }}
+        branch_name_core: ${{ matrix.branch_name }}
         conda_lock_file:  ${{ matrix.conda_lock }}
         environment_file: ${{ matrix.env_yml }}
-        github_token:     ${{ secrets.GITHUB_TOKEN }}
-        pr_title:         ${{ matrix.pr_title }}
+        gh_access_token:  ${{ secrets.GITHUB_TOKEN }}
+        pr_title_core:    ${{ matrix.pr_title }}
