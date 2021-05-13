@@ -104,7 +104,7 @@ and so you will need to add some ``sudo`` commands to the instructions below.
 
         bash conda_installer.sh -b -p $INSTALL_DIR/eos-s3/conda
         source "$INSTALL_DIR/eos-s3/conda/etc/profile.d/conda.sh"
-        conda env create -f eos-s3/conda_lock.yml -n eos-s3
+        env PIP_NO_DEPS="true" conda env create -f eos-s3/conda_lock.yml -n eos-s3
         conda activate eos-s3
         wget -qO- https://quicklogic-my.sharepoint.com/:u:/p/kkumar/EWuqtXJmalROpI2L5XeewMIBRYVCY8H4yc10nlli-Xq79g?download=1 | tar -xJ -C $INSTALL_DIR/eos-s3/
         conda deactivate
