@@ -58,3 +58,4 @@ dependencies:
     - xc-fasm @ git+https://github.com/symbiflow/xc-fasm@fc546c75eb9de814024d71e45d740a6eb197b180
 prefix: /usr/share/miniconda/envs/xc7
 
+test
