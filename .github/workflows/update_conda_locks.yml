@@ -25,7 +25,7 @@ jobs:
         ref:         ${{ matrix.pr_base }}
 
     - name: Update Lock and Issue a Pull Request
-      uses: antmicro/actions/update_conda_lock@e3bbfcaa18d82aa7dcd9acccd16da33c402f702d
+      uses: antmicro/actions/update_conda_lock@9fddb03ca16c65940b8b6f422da06a17101e3c9e
       with:
         branch_name_core: ${{ matrix.branch_name }}
         conda_lock_file:  ${{ matrix.conda_lock }}
