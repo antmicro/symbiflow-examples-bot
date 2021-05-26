@@ -9,7 +9,7 @@ on:
 
 jobs:
   update-locks:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -25,7 +25,57 @@ jobs:
         ref:         ${{ matrix.pr_base }}
 
     - name: Update Lock and Issue a Pull Request
-      uses: antmicro/actions/update_conda_lock@48820248e5be296d23ea84ebedf8c0c3e543f4ee
+      uses: antmicro/actions/update_conda_lock@eec0e6465f49e2e57828ff379e0fd162e0980540
+      with:
+        branch_name_core: ${{ matrix.branch_name }}
+        conda_lock_file:  ${{ matrix.conda_lock }}
+        environment_file: ${{ matrix.env_yml }}
+        gh_access_token:  ${{ secrets.GITHUB_TOKEN }}
+        pr_title_core:    ${{ matrix.pr_title }}
+
+  update-locks-win:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { branch_name: 'pre-merge-test_xc7-win', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda_lock.yml', pr_base: 'symbiflow-examples-master', pr_title: '[PRE-MERGE TEST] Bump xc7 lock Windows' }
+          - { branch_name: 'pre-merge-test_eos-s3-win', env_yml: 'eos-s3/environment.yml', conda_lock: 'eos-s3/conda_lock.yml', pr_base: 'symbiflow-examples-master', pr_title: '[PRE-MERGE TEST] Bump eos-s3 lock Windows' }
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        submodules:  'recursive'
+        ref:         ${{ matrix.pr_base }}
+
+    - name: Update Lock and Issue a Pull Request
+      uses: antmicro/actions/update_conda_lock@eec0e6465f49e2e57828ff379e0fd162e0980540
+      with:
+        branch_name_core: ${{ matrix.branch_name }}
+        conda_lock_file:  ${{ matrix.conda_lock }}
+        environment_file: ${{ matrix.env_yml }}
+        gh_access_token:  ${{ secrets.GITHUB_TOKEN }}
+        pr_title_core:    ${{ matrix.pr_title }}
+
+  update-locks-mac:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { branch_name: 'pre-merge-test_xc7-mac', env_yml: 'xc7/environment.yml', conda_lock: 'xc7/conda_lock.yml', pr_base: 'symbiflow-examples-master', pr_title: '[PRE-MERGE TEST] Bump xc7 lock macOS' }
+          - { branch_name: 'pre-merge-test_eos-s3-mac', env_yml: 'eos-s3/environment.yml', conda_lock: 'eos-s3/conda_lock.yml', pr_base: 'symbiflow-examples-master', pr_title: '[PRE-MERGE TEST] Bump eos-s3 lock macOS' }
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        submodules:  'recursive'
+        ref:         ${{ matrix.pr_base }}
+
+    - name: Update Lock and Issue a Pull Request
+      uses: antmicro/actions/update_conda_lock@eec0e6465f49e2e57828ff379e0fd162e0980540
       with:
         branch_name_core: ${{ matrix.branch_name }}
         conda_lock_file:  ${{ matrix.conda_lock }}
