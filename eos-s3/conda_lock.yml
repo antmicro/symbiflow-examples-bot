@@ -7,18 +7,18 @@ dependencies:
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=1_gnu
   - c-ares=1.17.1=h7f98852_1
-  - ca-certificates=2020.12.5=ha878542_0
-  - certifi=2020.12.5=py37h89c1867_1
+  - ca-certificates=2021.5.30=ha878542_0
+  - certifi=2021.5.30=py37h89c1867_0
   - coreutils=8.31=h516909a_0
-  - curl=7.76.1=h979ede3_1
-  - expat=2.3.0=h9c3ff4c_0
+  - curl=7.77.0=hea6ffbf_0
+  - expat=2.4.1=h9c3ff4c_0
   - gettext=0.19.8.1=h0b5b191_1005
   - git=2.30.2=pl5320h24fefe6_1
   - icu=68.1=h58526e2_0
   - intervaltree=3.0.2=py_0
-  - krb5=1.17.2=h926e7f8_0
+  - krb5=1.19.1=hcc1bbae_0
   - ld_impl_linux-64=2.35.1=hea4e1c9_2
-  - libcurl=7.76.1=hc4aaa36_1
+  - libcurl=7.77.0=h2574ce0_0
   - libedit=3.1.20191231=he28a2e2_2
   - libev=4.33=h516909a_1
   - libffi=3.3=h58526e2_2
@@ -28,15 +28,15 @@ dependencies:
   - libnghttp2=1.43.0=h812cca2_0
   - libssh2=1.9.0=ha56f1ee_6
   - libstdcxx-ng=9.3.0=h6de172a_19
-  - libxml2=2.9.10=h72842e0_4
+  - libxml2=2.9.12=h72842e0_0
   - libxslt=1.1.33=h15afd5d_2
   - lxml=4.6.3=py37h77fd288_0
   - make=4.3=hd18ef5c_1
   - ncurses=6.2=h58526e2_4
   - openssl=1.1.1k=h7f98852_0
-  - pcre=8.44=he1b5a44_0
-  - perl=5.32.0=h36c2ea0_0
-  - pip=21.1.1=pyhd8ed1ab_0
+  - pcre=8.45=h9c3ff4c_0
+  - perl=5.32.1=0_h7f98852_perl5
+  - pip=21.1.2=pyhd8ed1ab_0
   - python=3.7.10=hffdb5ce_100_cpython
   - python_abi=3.7=1_cp37m
   - quicklogic-vtr=v8.0.0.rc2_4003_g8980e4621=20200902_114536
@@ -45,7 +45,7 @@ dependencies:
   - readline=8.1=h46c0cb4_0
   - setuptools=49.6.0=py37h89c1867_3
   - simplejson=3.17.2=py37h5e8e339_2
-  - sortedcontainers=2.3.0=pyhd8ed1ab_0
+  - sortedcontainers=2.4.0=pyhd8ed1ab_0
   - sqlite=3.35.5=h74cdb3f_0
   - symbiflow-vtr=8.0.0rc2_4003_g8980e4621=20200902_114536
   - tbb=2021.2.0=h4bd325d_0
@@ -56,7 +56,7 @@ dependencies:
   - zlib=1.2.11=h516909a_1010
   - pip:
     - Arpeggio==1.10.2
-    - certifi==2020.12.5
+    - certifi==2021.5.30
     - fasm @ git+https://github.com/symbiflow/fasm@99f199f9e32fd30c8adffcc73c13caf95a951c35
     - fasm-utils @ git+https://github.com/QuickLogic-Corp/quicklogic-fasm-utils@3d6a375ddb6b55aaa5a59d99e44a207d4c18709f
     - intervaltree==3.0.2
