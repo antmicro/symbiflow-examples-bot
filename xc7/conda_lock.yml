@@ -1,50 +1,62 @@
-name: bot_env
+name: xc7
 channels:
   - litex-hub
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
-  - ca-certificates=2020.12.8=h06a4308_0
-  - certifi=2020.12.5=py38h06a4308_0
+  - _openmp_mutex=4.5=1_gnu
+  - ca-certificates=2021.5.25=h06a4308_1
+  - certifi=2021.5.30=py39h06a4308_0
   - dummy-pkg=0.0=b1
-  - expat=2.2.10=he6710b0_2
+  - expat=2.4.1=h2531618_2
   - git=2.23.0=pl526hacde149_0
   - icu=58.2=he6710b0_3
   - intervaltree=3.1.0=py_0
   - krb5=1.18.2=h173b8e3_0
-  - ld_impl_linux-64=2.33.1=h53a641e_7
+  - ld_impl_linux-64=2.35.1=h7274673_9
   - libcurl=7.71.1=h20c2e04_1
-  - libedit=3.1.20191231=h14c3975_1
+  - libedit=3.1.20210216=h27cfd23_1
   - libffi=3.3=he6710b0_2
-  - libgcc-ng=9.1.0=hdf63c60_0
+  - libgcc-ng=9.3.0=h5101ec6_17
+  - libgomp=9.3.0=h5101ec6_17
   - libssh2=1.9.0=h1ba5d50_1
-  - libstdcxx-ng=9.1.0=hdf63c60_0
+  - libstdcxx-ng=9.3.0=hd4cf53a_17
   - libxml2=2.9.10=hb55368b_3
   - libxslt=1.1.34=hc22bd24_0
-  - lxml=4.6.2=py38h9120a33_0
+  - lxml=4.6.3=py39h9120a33_0
   - make=4.2.1=h1bed415_1
   - ncurses=6.2=he6710b0_1
-  - openssl=1.1.1i=h27cfd23_0
+  - openssl=1.1.1k=h27cfd23_0
   - pcre=8.44=he6710b0_0
   - perl=5.26.2=h14c3975_0
-  - pip=20.3.3=py38h06a4308_0
+  - pip=21.1.2=py39h06a4308_0
   - prjxray-db=0.0_0239_gd87c844=20201120_145821
   - prjxray-tools=0.1_2697_g0f939808=20201120_145821
-  - python=3.8.5=h7579374_1
-  - readline=8.0=h7b6447c_0
-  - setuptools=51.0.0=py38h06a4308_2
-  - simplejson=3.17.2=py38h7b6447c_0
+  - python=3.9.5=h12debd9_4
+  - readline=8.1=h27cfd23_0
+  - setuptools=52.0.0=py39h06a4308_0
+  - simplejson=3.17.2=py39h27cfd23_2
   - sortedcontainers=2.3.0=pyhd3eb1b0_0
-  - sqlite=3.33.0=h62c20be_0
+  - sqlite=3.35.4=hdfb4753_0
   - symbiflow-vtr=8.0.0rc2_5082_gf1a3bcc2a=20201105_110531
   - symbiflow-yosys=0.8_6021_gd8b2d1a2=20201120_145821_libffi33
   - symbiflow-yosys-plugins=1.0.0.7_0174_g5e6370a=20201012_171341
-  - tbb=2020.3=hfd86e86_0
+  - tbb=2021.2.0=hff7bd54_0
   - tk=8.6.10=hbc83047_0
+  - tzdata=2020f=h52ac0ba_0
   - wheel=0.36.2=pyhd3eb1b0_0
   - xz=5.2.5=h7b6447c_0
   - zlib=1.2.11=h7b6447c_3
   - pip:
-    - Arpeggio
-prefix: /usr/share/miniconda/envs/bot_env
+    - Arpeggio==1.10.2
+    - certifi==2021.5.30
+    - fasm @ git+https://github.com/symbiflow/fasm@99f199f9e32fd30c8adffcc73c13caf95a951c35
+    - numpy==1.21.0
+    - prjxray @ git+git://github.com/SymbiFlow/prjxray.git@6e6bff0b160e6417da1bd9332f1ebf7ed52bc913
+    - pyjson5==1.5.1
+    - python-constraint==1.4.0
+    - PyYAML==5.4.1
+    - textX==2.3.0
+    - xc-fasm @ git+https://github.com/symbiflow/xc-fasm@edbf2b845c0b59e15a853413e13557b97e0fe74a
+prefix: /usr/share/miniconda/envs/xc7
 
